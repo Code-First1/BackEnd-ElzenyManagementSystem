@@ -1,0 +1,6 @@
+@BackEnd_ElzenyManagementSystem_HostAddress = http://localhost:5137
+
+GET {{BackEnd_ElzenyManagementSystem_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
