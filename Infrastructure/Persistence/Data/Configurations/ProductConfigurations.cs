@@ -16,6 +16,10 @@ namespace Persistence.Data.Configurations
             builder.HasOne(P => P.Category)
                 .WithMany()
                 .HasForeignKey(P => P.CategoryId);
+
+            builder.Property(p => p.PricePerUnit)
+                   .HasPrecision(18, 2);
+
         }
     }
 }

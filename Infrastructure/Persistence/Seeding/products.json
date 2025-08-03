@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Wireless Mouse",
+    "description": "Ergonomic wireless mouse with adjustable DPI settings.",
+    "unit": "Piece",
+    "price": 150.75,
+    "pricePerUnit": 150.75,
+    "categoryId": 5
+  },
+  {
+    "name": "Organic Bananas",
+    "description": "Fresh organic bananas, approx. 1kg bunch.",
+    "unit": "Piece",
+    "price": 30.00,
+    "pricePerUnit": 30.00,
+    "categoryId": 6
+  },
+  {
+    "name": "Wooden Desk",
+    "description": "Spacious wooden desk with 3 drawers.",
+    "unit": "Piece",
+    "price": 950.00,
+    "pricePerUnit": 950.00,
+    "categoryId": 7
+  },
+  {
+    "name": "Programming in C#",
+    "description": "Beginner to advanced C# guide.",
+    "unit": "Piece",
+    "price": 120.00,
+    "pricePerUnit": 120.00,
+    "categoryId": 8
+  }
+]
