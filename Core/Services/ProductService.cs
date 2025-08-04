@@ -2,6 +2,7 @@
 using Domain.Contracts;
 using Domain.Models;
 using Services.Abstractions;
+using Services.Specifications;
 using Shared.DTOs.Product;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +14,18 @@ namespace Services
     {
         public async Task<IEnumerable<ProductResultDto>> GetProductsAsync()
         {
-            var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync();
+            var spec = new ProductWithCategoriesSpecification();
+
+
+            var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(spec);
             return mapper.Map<IEnumerable<ProductResultDto>>(products);
         }
 
         public async Task<ProductResultDto?> GetProductByIdAsync(int id)
         {
-            var product = await unitOfWork.GetRepository<Product, int>().GetAsync(id);
+            var spec = new ProductWithCategoriesSpecification(id);
+
+            var product = await unitOfWork.GetRepository<Product, int>().GetAsync(spec);
             return product is null ? null : mapper.Map<ProductResultDto>(product);
         }
 

@@ -32,6 +32,7 @@ namespace BackEnd_ElzenyManagementSystem
             builder.Services.AddScoped<IDbInitializer,DbInitializer>(); //Allow DI For DbInitalizer
             builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
             builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(AssemblyRef).Assembly));
+            builder.Services.AddTransient<PictureUrlResolver>();
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
             var app = builder.Build();

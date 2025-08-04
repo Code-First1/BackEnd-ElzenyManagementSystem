@@ -12,7 +12,7 @@ namespace Domain.Contracts
         Task<IEnumerable<TEntity>> GetAllAsync(bool trackChages = false);
         Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity, Tkey> spec, bool trackChages = false);
         Task<TEntity?> GetAsync(Tkey id);
-        Task<TEntity?> GetAsync(ISpecifications<TEntity, Tkey> spec, Tkey id);
+        Task<TEntity?> GetAsync(ISpecifications<TEntity, Tkey> spec);
         Task AddAsync(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);

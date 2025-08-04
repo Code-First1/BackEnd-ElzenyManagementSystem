@@ -66,7 +66,7 @@ namespace Persistence.Repositories
             return await ApplySpecifications(spec).ToListAsync();
         }
 
-        public async Task<TEntity?> GetAsync(ISpecifications<TEntity, TKey> spec, TKey id)
+        public async Task<TEntity?> GetAsync(ISpecifications<TEntity, TKey> spec)
         {
             return await ApplySpecifications(spec).FirstOrDefaultAsync();
         }
