@@ -22,6 +22,8 @@ namespace Domain.Models
         [Range(0.01, double.MaxValue, ErrorMessage = "Price per unit must be greater than 0.")]
         public decimal PricePerUnit { get; set; }
 
+        public string? PictureUrl { get; set; }
+
         //Forign Keys
         [Required(ErrorMessage = "Category is required.")]
         public int CategoryId { get; set; }
