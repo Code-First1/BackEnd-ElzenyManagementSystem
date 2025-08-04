@@ -36,7 +36,7 @@ namespace Persistence.Repositories
             await _context.AddAsync(entity);
         }
 
-        public async Task Update(TEntity entity)
+        public void Update(TEntity entity)
         {
              _context.Update(entity);
         }
