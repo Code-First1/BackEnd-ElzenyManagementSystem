@@ -1,8 +1,12 @@
 
 using Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Persistence;
 using Persistence.Data;
+using Persistence.Repositories;
+using Services;
+using Services.Abstractions;
 using System.Threading.Tasks;
 
 namespace BackEnd_ElzenyManagementSystem
@@ -26,6 +30,9 @@ namespace BackEnd_ElzenyManagementSystem
             }
             );
             builder.Services.AddScoped<IDbInitializer,DbInitializer>(); //Allow DI For DbInitalizer
+            builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
+            builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(AssemblyRef).Assembly));
+            builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
             var app = builder.Build();
 

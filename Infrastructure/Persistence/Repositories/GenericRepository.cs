@@ -20,6 +20,14 @@ namespace Persistence.Repositories
         }
         public async Task<IEnumerable<TEntity>> GetAllAsync(bool trackChages = false)
         {
+            if(typeof(TEntity) == typeof(Product))
+            {
+                if (trackChages)
+                    return await _context.Products.Include(P => P.Category).ToListAsync() as IEnumerable<TEntity>;
+                return await _context.Products.AsNoTracking().Include(P => P.Category).ToListAsync() as IEnumerable<TEntity>;
+
+            }
+
             if(trackChages)
                 return await _context.Set<TEntity>().ToListAsync();
             return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
@@ -28,6 +36,12 @@ namespace Persistence.Repositories
 
         public async Task<TEntity?> GetAsync(TKey id)
         {
+            if (typeof(TEntity) == typeof(Product))
+            {
+                return await _context.Products.Include(P => P.Category).FirstOrDefaultAsync(P => P.Id == id as int?) as TEntity;
+
+            }
+
             return await _context.Set<TEntity>().FindAsync(id);    
         }
 

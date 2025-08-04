@@ -18,8 +18,7 @@ namespace Shared.DTOs.Product
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Unit is required.")]
-        public Unit Unit { get; set; }
-        public float Price { get; set; }
+        public string Unit { get; set; }
 
         [Required(ErrorMessage = "Price per unit is required.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price per unit must be greater than 0.")]
