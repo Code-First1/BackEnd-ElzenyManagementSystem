@@ -15,12 +15,14 @@ namespace Services.Specifications
             ApplyInclude();
         }
 
-        public ProductWithCategoriesSpecification(int? categoryId) 
+        public ProductWithCategoriesSpecification(int? categoryId,string? sort) 
             : base(
-                  p => (categoryId.HasValue && p.CategoryId == categoryId)
+                  p => (!categoryId.HasValue || p.CategoryId == categoryId)
                   )
         {
             ApplyInclude();
+
+            ApplySorting(sort);
         }
 
         private void ApplyInclude()
@@ -28,5 +30,31 @@ namespace Services.Specifications
             AddInclude(P => P.Category);
         }
 
+        private void ApplySorting(string? sort)
+        {
+            if (!string.IsNullOrEmpty(sort))
+            {
+                switch (sort.ToLower())
+                {
+                    case "namedesc":
+                        AddOrderByDescending(P => P.Name);
+                        break;
+                    case "priceasc":
+                        AddOrderBy(P => P.PricePerUnit);
+                        break;
+                    case "pricedesc":
+                        AddOrderByDescending(P => P.PricePerUnit);
+                        break;
+                    default:
+                        AddOrderBy(P => P.Name);
+                        break;
+
+                }
+            }
+            else
+            {
+                AddOrderBy(P => P.Name);
+            }
+        }
     }
 }

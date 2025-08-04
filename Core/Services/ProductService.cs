@@ -12,9 +12,9 @@ namespace Services
 {
     public class ProductService(IUnitOfWork unitOfWork, IMapper mapper) : IProductService
     {
-        public async Task<IEnumerable<ProductResultDto>> GetProductsAsync(int? categoryId)
+        public async Task<IEnumerable<ProductResultDto>> GetProductsAsync(int? categoryId, string? sort)
         {
-            var spec = new ProductWithCategoriesSpecification(categoryId);
+            var spec = new ProductWithCategoriesSpecification(categoryId, sort);
 
 
             var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(spec);
