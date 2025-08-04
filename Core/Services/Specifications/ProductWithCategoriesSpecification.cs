@@ -15,7 +15,10 @@ namespace Services.Specifications
             ApplyInclude();
         }
 
-        public ProductWithCategoriesSpecification() : base(null)
+        public ProductWithCategoriesSpecification(int? categoryId) 
+            : base(
+                  p => (categoryId.HasValue && p.CategoryId == categoryId)
+                  )
         {
             ApplyInclude();
         }
