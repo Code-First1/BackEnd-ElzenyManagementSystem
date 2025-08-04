@@ -1,6 +1,7 @@
 ﻿using Domain.Models;
 using Shared.DTOs.Category;
 using Shared.DTOs.Product;
+using Shared.Response;
 using Shared.SpecificationsParam.Product;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Services.Abstractions
     public interface IProductService
     {
         //GetAllProduct
-        Task<IEnumerable<ProductResultDto>> GetProductsAsync(ProductSpecificationsParamters productSpecsParams);
+        Task<PaginationResponse<ProductResultDto>> GetProductsAsync(ProductSpecificationsParamters productSpecsParams);
         //GetById
         Task<ProductResultDto?> GetProductByIdAsync(int id);
 

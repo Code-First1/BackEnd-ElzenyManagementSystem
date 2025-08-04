@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Specifications
+namespace Services.Specifications.Products
 {
     public class ProductWithCategoriesSpecification : BaseSpecifications<Product,int>
     {
@@ -18,7 +18,7 @@ namespace Services.Specifications
 
         public ProductWithCategoriesSpecification(ProductSpecificationsParamters productSpecsParams) 
             : base(
-                  p => (!productSpecsParams.CategoryId.HasValue || p.CategoryId == productSpecsParams.CategoryId)
+                  p => !productSpecsParams.CategoryId.HasValue || p.CategoryId == productSpecsParams.CategoryId
                   )
         {
             ApplyInclude();
