@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Shared.SpecificationsParam.Product;
 using System;
 using System.Collections.Generic;
 using System.Formats.Tar;
@@ -15,16 +16,16 @@ namespace Services.Specifications
             ApplyInclude();
         }
 
-        public ProductWithCategoriesSpecification(int? categoryId, string? sort, int pageIndex = 1, int pageSize = 5) 
+        public ProductWithCategoriesSpecification(ProductSpecificationsParamters productSpecsParams) 
             : base(
-                  p => (!categoryId.HasValue || p.CategoryId == categoryId)
+                  p => (!productSpecsParams.CategoryId.HasValue || p.CategoryId == productSpecsParams.CategoryId)
                   )
         {
             ApplyInclude();
 
-            ApplySorting(sort);
+            ApplySorting(productSpecsParams.sort);
 
-            ApplyPagination(pageIndex, pageSize);
+            ApplyPagination(productSpecsParams.PageIndex, productSpecsParams.PageSize);
         }
 
         private void ApplyInclude()

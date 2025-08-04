@@ -4,6 +4,7 @@ using Domain.Models;
 using Services.Abstractions;
 using Services.Specifications;
 using Shared.DTOs.Product;
+using Shared.SpecificationsParam.Product;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,9 +13,9 @@ namespace Services
 {
     public class ProductService(IUnitOfWork unitOfWork, IMapper mapper) : IProductService
     {
-        public async Task<IEnumerable<ProductResultDto>> GetProductsAsync(int? categoryId, string? sort, int pageIndex = 1, int pageSize = 5)
+        public async Task<IEnumerable<ProductResultDto>> GetProductsAsync(ProductSpecificationsParamters productSpecsParams)
         {
-            var spec = new ProductWithCategoriesSpecification(categoryId, sort, pageIndex, pageSize);
+            var spec = new ProductWithCategoriesSpecification(productSpecsParams);
 
 
             var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(spec);

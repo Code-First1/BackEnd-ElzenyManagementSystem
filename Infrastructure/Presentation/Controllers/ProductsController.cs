@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Shared.DTOs.Product;
+using Shared.SpecificationsParam.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,9 @@ namespace Presentation.Controllers
         // sort : namedesc
         // sort : priecasc
         // sort : priecdesc
-        public async Task<IActionResult> GetAll(int? categoryId, string? sort, int pageIndex = 1, int pageSize = 5)
+        public async Task<IActionResult> GetAll([FromQuery]ProductSpecificationsParamters productSpecsParams)
         {
-            var result = await serviceManager.ProductService.GetProductsAsync(categoryId, sort, pageIndex, pageSize);
+            var result = await serviceManager.ProductService.GetProductsAsync(productSpecsParams);
             return Ok(result);
         }
 
