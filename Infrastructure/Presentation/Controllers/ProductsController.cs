@@ -18,9 +18,9 @@ namespace Presentation.Controllers
         // sort : namedesc
         // sort : priecasc
         // sort : priecdesc
-        public async Task<IActionResult> GetAll(int? categoryId, string? sort)
+        public async Task<IActionResult> GetAll(int? categoryId, string? sort, int pageIndex = 1, int pageSize = 5)
         {
-            var result = await serviceManager.ProductService.GetProductsAsync(categoryId, sort);
+            var result = await serviceManager.ProductService.GetProductsAsync(categoryId, sort, pageIndex, pageSize);
             return Ok(result);
         }
 

@@ -15,7 +15,7 @@ namespace Services.Specifications
             ApplyInclude();
         }
 
-        public ProductWithCategoriesSpecification(int? categoryId,string? sort) 
+        public ProductWithCategoriesSpecification(int? categoryId, string? sort, int pageIndex = 1, int pageSize = 5) 
             : base(
                   p => (!categoryId.HasValue || p.CategoryId == categoryId)
                   )
@@ -23,6 +23,8 @@ namespace Services.Specifications
             ApplyInclude();
 
             ApplySorting(sort);
+
+            ApplyPagination(pageIndex, pageSize);
         }
 
         private void ApplyInclude()
