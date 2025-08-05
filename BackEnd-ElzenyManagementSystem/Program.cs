@@ -1,6 +1,7 @@
 
 using BackEnd_ElzenyManagementSystem.Middlewares;
 using Domain.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence;
@@ -8,6 +9,7 @@ using Persistence.Data;
 using Persistence.Repositories;
 using Services;
 using Services.Abstractions;
+using Shared.ErrorModels;
 using System.Threading.Tasks;
 
 namespace BackEnd_ElzenyManagementSystem
@@ -35,6 +37,27 @@ namespace BackEnd_ElzenyManagementSystem
             builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(AssemblyRef).Assembly));
             builder.Services.AddTransient<PictureUrlResolver>();
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
+
+            builder.Services.Configure<ApiBehaviorOptions>(config =>
+            {
+                config.InvalidModelStateResponseFactory = (actioncontext) =>
+                {
+                    var errors = actioncontext.ModelState
+                                    .Where(m => m.Value.Errors.Any())
+                                    .Select(m => new ValidationError()
+                                    {
+                                        Field = m.Key,
+                                        Errors = m.Value.Errors.Select(errors => errors.ErrorMessage)
+                                    });
+                    
+                    var response = new ValidationErrorResponse()
+                    {   
+                        Errors = errors
+                    };
+
+                    return new BadRequestObjectResult(response);
+                };
+            });
 
             var app = builder.Build();
 
