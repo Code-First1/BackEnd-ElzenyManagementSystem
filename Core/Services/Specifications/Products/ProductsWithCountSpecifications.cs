@@ -12,7 +12,9 @@ namespace Services.Specifications.Products
     {
         public ProductsWithCountSpecifications(ProductSpecificationsParamters productSpecsParams)
             : base(
-                  p => !productSpecsParams.CategoryId.HasValue || p.CategoryId == productSpecsParams.CategoryId
+                  P =>
+                    (string.IsNullOrEmpty(productSpecsParams.Search) || P.Name.ToLower().Contains(productSpecsParams.Search.ToLower())) &&
+                    (!productSpecsParams.CategoryId.HasValue || P.CategoryId == productSpecsParams.CategoryId)
                   )
         {
             

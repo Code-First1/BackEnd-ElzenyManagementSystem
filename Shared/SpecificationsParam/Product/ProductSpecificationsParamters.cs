@@ -10,6 +10,8 @@ namespace Shared.SpecificationsParam.Product
     {
         public int? CategoryId {  get; set; }
         public string? sort {  get; set; }
+        public string? Search {  get; set; }
+
         private int _pageIndex = 1;
         private int _pageSize = 10;
 
