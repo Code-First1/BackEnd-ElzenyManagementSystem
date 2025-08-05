@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Shared.DTOs.Product;
+using Shared.ErrorModels;
+using Shared.Response;
 using Shared.SpecificationsParam.Product;
 using System;
 using System.Collections.Generic;
@@ -14,19 +17,27 @@ namespace Presentation.Controllers
     [Route(template:"api/[controller]")]
     public class ProductsController(IServiceManager serviceManager) : ControllerBase
     {
-        [HttpGet]
         // sort : nameasc
         // sort : namedesc
         // sort : priecasc
         // sort : priecdesc
-        public async Task<IActionResult> GetAll([FromQuery]ProductSpecificationsParamters productSpecsParams)
+
+        [HttpGet] //GET: /api/Products
+        [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status200OK, Type =  typeof(PaginationResponse<ProductResultDto>))]
+        [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status500InternalServerError, Type =  typeof(ErrorDetails))]
+        [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
+        public async Task<ActionResult<PaginationResponse<ProductResultDto>>> GetAll([FromQuery]ProductSpecificationsParamters productSpecsParams)
         {
             var result = await serviceManager.ProductService.GetProductsAsync(productSpecsParams);
             return Ok(result);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        [ProducesResponseType<ProductResultDto>(StatusCodes.Status200OK, Type = typeof(ProductResultDto))]
+        [ProducesResponseType<ProductResultDto>(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
+        [ProducesResponseType<ProductResultDto>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
+        [ProducesResponseType<ProductResultDto>(StatusCodes.Status404NotFound, Type = typeof(ErrorDetails))]
+        public async Task<ActionResult<ProductResultDto>> GetById(int id)
         {
             var result = await serviceManager.ProductService.GetProductByIdAsync(id);
             return result is null ? NotFound() : Ok(result);
