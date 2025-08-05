@@ -1,4 +1,5 @@
-﻿using Shared.ErrorModels;
+﻿using Domain.Exceptions;
+using Shared.ErrorModels;
 
 namespace BackEnd_ElzenyManagementSystem.Middlewares
 {
@@ -24,19 +25,26 @@ namespace BackEnd_ElzenyManagementSystem.Middlewares
                 _logger.LogError(ex, ex.Message);
 
                 // 1.Set Status Code For Response
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                // 2. Set Content Typex
+                // 3. Response Object (Body)
+                // 4. Return Repsonse
 
-                // 2. Set Content Type
+
+                
                 context.Response.ContentType = "application/json";
 
-                // 3. Response Object (Body)
                 var response = new ErrorDetails()
                 {
-                    StatusCode = StatusCodes.Status500InternalServerError,
                     ErrorMessage = ex.Message
                 };
-                    
-                // 4. Return Repsonse
+                response.StatusCode = ex switch
+                {
+                    NotFoundException => StatusCodes.Status404NotFound,
+                    _=> StatusCodes.Status500InternalServerError
+                };
+
+                context.Response.StatusCode = response.StatusCode;
+
                 await context.Response.WriteAsJsonAsync(response);
 
             }
