@@ -1,4 +1,5 @@
 
+using BackEnd_ElzenyManagementSystem.Middlewares;
 using Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,8 @@ namespace BackEnd_ElzenyManagementSystem
             using var scope =  app.Services.CreateScope();
             var dbInitializer =  scope.ServiceProvider.GetRequiredService<IDbInitializer>();
             await dbInitializer.InitializeAsync();
+
+            app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
