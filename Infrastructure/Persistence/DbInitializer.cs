@@ -1,7 +1,10 @@
 ﻿using Domain.Contracts;
 using Domain.Models;
+using Domain.Models.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
+using Persistence.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +18,20 @@ namespace Persistence
     public class DbInitializer : IDbInitializer
     {
         private readonly ElzenyDbContext _context;
-        public DbInitializer(ElzenyDbContext context)
+        private readonly ElzenyIdentityDbContext _identityDbContet;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public DbInitializer(
+            ElzenyDbContext context,
+            ElzenyIdentityDbContext identityDbContext,
+            UserManager<AppUser> userManager,
+            RoleManager<IdentityRole> roleManager
+            )
         {
             _context = context;
+            _identityDbContet = identityDbContext;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
         public async Task InitializeAsync()
         {
@@ -75,6 +89,56 @@ namespace Persistence
             catch(Exception) 
             {
                 throw;
+            }
+        }
+
+        public async Task InitializeIdentityAsync()
+        {
+            // Create Databse If it doesnt Exxists && Apply To Any Pending Migrations
+            if(_identityDbContet.Database.GetPendingMigrations().Any())
+            {
+                await _identityDbContet.Database.MigrateAsync();
+            }
+
+            if (!_roleManager.Roles.Any())
+            {
+                await _roleManager.CreateAsync(role: new IdentityRole() 
+                {
+                    Name = "Admin"
+                });
+                await _roleManager.CreateAsync(role: new IdentityRole() 
+                {
+                    Name = "Seller"
+                });
+            }
+
+            // Seeding
+            if(!_userManager.Users.Any())
+            {
+                var adminUser = new AppUser()
+                {
+                    DisplayName = "Elzeny",
+                    UserName = "MostafaElzeny"
+                };
+                var sellerUser = new AppUser()
+                {
+                    DisplayName = "Abdo",
+                    UserName = "AbdoAli"
+                };
+                var result1 = await _userManager.CreateAsync(adminUser, "P@ssW0rd");
+                if (!result1.Succeeded)
+                {
+                    throw new Exception("Failed to create admin user: " + string.Join(", ", result1.Errors.Select(e => e.Description)));
+                }
+
+                var result2 = await _userManager.CreateAsync(sellerUser, "P@ssW0rd");
+                if (!result2.Succeeded)
+                {
+                    throw new Exception("Failed to create seller user: " + string.Join(", ", result2.Errors.Select(e => e.Description)));
+                }
+
+                await _userManager.AddToRoleAsync(adminUser, role: "Admin");
+                await _userManager.AddToRoleAsync(sellerUser, role: "Seller");
             }
         }
     }

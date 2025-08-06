@@ -12,15 +12,17 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
             app.UseGlobalErrorHandling();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+            //if (app.Environment.IsDevelopment())
+            //{
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            //}
 
             app.UseStaticFiles();
 
             app.UseHttpsRedirection();
+
+            app.UseRouting();
 
             app.UseAuthorization();
 
@@ -35,11 +37,12 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
             using var scope = app.Services.CreateScope();
             var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
             await dbInitializer.InitializeAsync();
+            await dbInitializer.InitializeIdentityAsync();
 
             return app;
         }
         
-        private static async Task<WebApplication> UseGlobalErrorHandling(this WebApplication app)
+        private static WebApplication UseGlobalErrorHandling(this WebApplication app)
         {
             app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 

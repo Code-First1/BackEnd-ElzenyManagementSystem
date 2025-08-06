@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BackEnd_ElzenyManagementSystem</RootNamespace>
+    <UserSecretsId>ba1afe15-2e56-4b59-8fc0-a7a5de787d68</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

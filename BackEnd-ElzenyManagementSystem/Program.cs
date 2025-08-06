@@ -27,7 +27,7 @@ namespace BackEnd_ElzenyManagementSystem
             var app = builder.Build();
 
             // Configre the HTTP request pipeline
-            app.ConfigureAllMiddlewares();
+            await app.ConfigureAllMiddlewares();
 
             app.Run();
         }

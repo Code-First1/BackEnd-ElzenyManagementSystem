@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Domain.Models.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Persistence;
+using Persistence.Identity;
 using Services;
 using Shared.ErrorModels;
 
@@ -15,6 +18,8 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
             services.AddSwaggerServices();
 
             services.AddInfrastructureServices(configuration);
+            services.AddIdentityService();
+
             services.AddApplicatinServices();
 
             services.ConfigureServices();
@@ -62,5 +67,15 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
 
             return services;
         }
+
+        private static IServiceCollection AddIdentityService(this IServiceCollection services)
+        {
+            services
+                .AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores <ElzenyIdentityDbContext>();
+
+            return services;
+        }
+
     }
 }
