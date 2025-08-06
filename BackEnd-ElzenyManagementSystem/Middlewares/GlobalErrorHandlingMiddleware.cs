@@ -1,4 +1,5 @@
 ﻿using Domain.Exceptions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.ErrorModels;
 
 namespace BackEnd_ElzenyManagementSystem.Middlewares
@@ -49,6 +50,9 @@ namespace BackEnd_ElzenyManagementSystem.Middlewares
             response.StatusCode = ex switch
             {
                 NotFoundException => StatusCodes.Status404NotFound,
+                BadRequestException => StatusCodes.Status400BadRequest,
+                ValidationException => StatusCodes.Status400BadRequest,
+                UnAuthorizedException => HandleValidationException((ValidationException)ex,response),
                 _ => StatusCodes.Status500InternalServerError
             };
 
@@ -67,5 +71,12 @@ namespace BackEnd_ElzenyManagementSystem.Middlewares
             };
             await context.Response.WriteAsJsonAsync(response);
         }
+
+        private static  int HandleValidationException(ValidationException ex, ErrorDetails response)
+        {
+            response.Errors = ex.Errors;
+            return StatusCodes.Status400BadRequest;
+        }
+
     }
 }
