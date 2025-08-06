@@ -9,7 +9,7 @@ namespace Services.Abstractions
     public interface IServiceManager
     {
         IProductService ProductService { get; }
-
         ICategoryService CategoryService { get; }
+        IAuthService AuthService { get; }
     }
 }

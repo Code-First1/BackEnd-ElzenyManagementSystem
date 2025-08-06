@@ -51,8 +51,8 @@ namespace BackEnd_ElzenyManagementSystem.Middlewares
             {
                 NotFoundException => StatusCodes.Status404NotFound,
                 BadRequestException => StatusCodes.Status400BadRequest,
-                ValidationException => StatusCodes.Status400BadRequest,
-                UnAuthorizedException => HandleValidationException((ValidationException)ex,response),
+                ValidationException => HandleValidationException((ValidationException)ex, response),
+                UnAuthorizedException => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError
             };
 

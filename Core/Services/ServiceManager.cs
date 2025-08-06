@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
+using Domain.Models.Identity;
+using Microsoft.AspNetCore.Identity;
 using Services.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -9,10 +11,14 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class ServiceManager(IUnitOfWork unitOfWork, IMapper mapper) : IServiceManager
+    public class ServiceManager(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        UserManager<AppUser> userManager
+        ) : IServiceManager
     {
         public IProductService ProductService { get; } = new ProductService(unitOfWork, mapper);
-
         public ICategoryService CategoryService { get; } = new CategoryService(unitOfWork, mapper);
+        public IAuthService AuthService { get; } = new AuthService(userManager);
     }
 }
