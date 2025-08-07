@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Shared.DTOs.Product;
@@ -23,6 +24,7 @@ namespace Presentation.Controllers
         // sort : priecdesc
 
         [HttpGet] //GET: /api/Products
+        [Authorize]
         [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status200OK, Type =  typeof(PaginationResponse<ProductResultDto>))]
         [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status500InternalServerError, Type =  typeof(ErrorDetails))]
         [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
