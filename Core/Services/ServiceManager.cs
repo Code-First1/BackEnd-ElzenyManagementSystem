@@ -3,7 +3,9 @@ using Domain.Contracts;
 using Domain.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Services.Abstractions;
+using Shared.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +18,11 @@ namespace Services
         IUnitOfWork unitOfWork,
         IMapper mapper,
         UserManager<AppUser> userManager,
-        IConfiguration configuration
+        IOptions<JwtOptions> options
         ) : IServiceManager
     {
         public IProductService ProductService { get; } = new ProductService(unitOfWork, mapper);
         public ICategoryService CategoryService { get; } = new CategoryService(unitOfWork, mapper);
-        public IAuthService AuthService { get; } = new AuthService(userManager, configuration);
+        public IAuthService AuthService { get; } = new AuthService(userManager, options);
     }
 }

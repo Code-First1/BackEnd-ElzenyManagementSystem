@@ -5,6 +5,7 @@ using Persistence;
 using Persistence.Identity;
 using Services;
 using Shared.ErrorModels;
+using Shared.Options;
 
 namespace BackEnd_ElzenyManagementSystem.Extensions
 {
@@ -20,7 +21,8 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
             services.AddInfrastructureServices(configuration);
             services.AddIdentityService();
 
-            services.AddApplicatinServices();
+            services.AddApplicatinServices(configuration);
+
 
             services.ConfigureServices();
 

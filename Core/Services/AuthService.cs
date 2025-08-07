@@ -2,10 +2,12 @@
 using Domain.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Services.Abstractions;
 using Shared.DTOs.Auth;
 using Shared.DTOs.User;
+using Shared.Options;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -19,7 +21,7 @@ namespace Services
 {
     public class AuthService(
         UserManager<AppUser> userManager,
-        IConfiguration configuration
+        IOptions<JwtOptions> options
         ) : IAuthService
     {
         public async Task<UserResultDto> LoginAsync(LoginDto loginDto)
@@ -63,6 +65,8 @@ namespace Services
             //Header
             //Payload
             //Signature
+            var jwtOptions = options.Value;
+
             var authClaims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, user.UserName),
@@ -75,13 +79,13 @@ namespace Services
             }
 
             // "dssdsdsdsd"
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtOptions:SecretKey"]));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey));
 
             var token = new JwtSecurityToken(
-                issuer: configuration["JwtOptions:Issuer"],
-                audience: configuration["JwtOptions:Audience"],
+                issuer: jwtOptions.Issuer,
+                audience: jwtOptions.Audience,
                 claims: authClaims,
-                expires: DateTime.UtcNow.AddHours(double.Parse(configuration["JwtOptions:DurationInHours"])),
+                expires: DateTime.UtcNow.AddHours(jwtOptions.DurationInHours),
                 signingCredentials: new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256)
                 );
 
