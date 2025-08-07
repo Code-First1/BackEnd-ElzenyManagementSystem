@@ -1,11 +1,15 @@
 ﻿using Domain.Models.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Persistence.Identity;
 using Services;
 using Shared.ErrorModels;
 using Shared.Options;
+using System.Text;
 
 namespace BackEnd_ElzenyManagementSystem.Extensions
 {
@@ -23,6 +27,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
 
             services.AddApplicatinServices(configuration);
 
+            services.ConfigureJwtServices(configuration);
 
             services.ConfigureServices();
 
@@ -34,6 +39,33 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
         {
             services.AddControllers();
 
+            return services;
+        }
+
+        private static IServiceCollection ConfigureJwtServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtOptions = configuration.GetSection("JwtOptions").Get<JwtOptions>();
+
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidateLifetime = true,
+
+                        ValidIssuer = jwtOptions.Issuer,
+                        ValidAudience = jwtOptions.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+                    };
+                });
             return services;
         }
         private static IServiceCollection AddSwaggerServices(this IServiceCollection services)
