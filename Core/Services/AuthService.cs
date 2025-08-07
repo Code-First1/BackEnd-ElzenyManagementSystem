@@ -1,6 +1,7 @@
 ﻿using Domain.Exceptions;
 using Domain.Models.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Services.Abstractions;
 using Shared.DTOs.Auth;
@@ -16,7 +17,10 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class AuthService(UserManager<AppUser> userManager) : IAuthService
+    public class AuthService(
+        UserManager<AppUser> userManager,
+        IConfiguration configuration
+        ) : IAuthService
     {
         public async Task<UserResultDto> LoginAsync(LoginDto loginDto)
         {
@@ -71,13 +75,13 @@ namespace Services
             }
 
             // "dssdsdsdsd"
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("STRONGSecurityKeyForAUTHENTICATIONSTRONGSecurityKeyForAUTHENTICATION"));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtOptions:SecretKey"]));
 
             var token = new JwtSecurityToken(
-                issuer: "https://localhost:44396",
-                audience: "MyAudience",
+                issuer: configuration["JwtOptions:Issuer"],
+                audience: configuration["JwtOptions:Audience"],
                 claims: authClaims,
-                expires: DateTime.UtcNow.AddHours(14),
+                expires: DateTime.UtcNow.AddHours(double.Parse(configuration["JwtOptions:DurationInHours"])),
                 signingCredentials: new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256)
                 );
 
