@@ -1,4 +1,5 @@
 ﻿using Domain.Exceptions;
+using Domain.Exceptions.Auth;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.ErrorModels;
 

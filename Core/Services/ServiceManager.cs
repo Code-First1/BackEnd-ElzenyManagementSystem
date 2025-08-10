@@ -18,11 +18,12 @@ namespace Services
         IUnitOfWork unitOfWork,
         IMapper mapper,
         UserManager<AppUser> userManager,
-        IOptions<JwtOptions> options
+        IOptions<JwtOptions> options,
+        RoleManager<IdentityRole> roleManager
         ) : IServiceManager
     {
         public IProductService ProductService { get; } = new ProductService(unitOfWork, mapper);
         public ICategoryService CategoryService { get; } = new CategoryService(unitOfWork, mapper);
-        public IAuthService AuthService { get; } = new AuthService(userManager, options);
+        public IAuthService AuthService { get; } = new AuthService(userManager, options, roleManager);
     }
 }

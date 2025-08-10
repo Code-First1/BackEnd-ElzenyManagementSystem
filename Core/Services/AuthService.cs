@@ -1,4 +1,5 @@
 ﻿using Domain.Exceptions;
+using Domain.Exceptions.Auth;
 using Domain.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -21,9 +22,12 @@ namespace Services
 {
     public class AuthService(
         UserManager<AppUser> userManager,
-        IOptions<JwtOptions> options
+        IOptions<JwtOptions> options,
+        RoleManager<IdentityRole> roleManager
         ) : IAuthService
     {
+        
+
         public async Task<UserResultDto> LoginAsync(LoginDto loginDto)
         {
             var user = await userManager.FindByNameAsync(loginDto.UserName);
@@ -52,6 +56,20 @@ namespace Services
                 var errors = result.Errors.Select(errors => errors.Description);
                 throw new ValidationException(errors);
             }
+            if(!string.IsNullOrEmpty(registerDto.Role))
+            {
+                var roleExists = await roleManager.RoleExistsAsync(registerDto.Role);
+                if (!roleExists)
+                    throw new RoleNotFoundException(registerDto.Role);
+
+                var roleAssignResult = await userManager.AddToRoleAsync(user, registerDto.Role);
+                if(!roleAssignResult.Succeeded)
+                {
+                    var errors = roleAssignResult.Errors.Select(errors => errors.Description);
+                    throw new ValidationException(errors);
+                }
+
+            }
 
             return new UserResultDto()
             {
@@ -60,6 +78,26 @@ namespace Services
             };
         }
 
+        public async Task ChangePasswordAsync(ChangePasswordDto changePasswordDto)
+        {
+            var user = await userManager.FindByNameAsync(changePasswordDto.UserName);
+            if (user == null)
+                throw new UserNotFoundException(changePasswordDto.UserName);
+
+            var result = await userManager.ChangePasswordAsync(
+                user,
+                changePasswordDto.CurrrentPassword,
+                changePasswordDto.NewPassword
+                );
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                throw new ValidationException(errors);
+
+            }
+
+        }
         private async Task<string> GenerateJwtTokenAsync(AppUser user)
         {
             //Header
@@ -69,13 +107,13 @@ namespace Services
 
             var authClaims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim("user_name", user.UserName),
             };
 
             var roles = await userManager.GetRolesAsync(user);
             foreach(var role in roles)
             {
-                authClaims.Add(item: new Claim(ClaimTypes.Role, role));
+                authClaims.Add(item: new Claim("role", role));
             }
 
             // "dssdsdsdsd"
