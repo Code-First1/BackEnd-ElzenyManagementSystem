@@ -36,47 +36,91 @@ namespace Services
             var flag = await userManager.CheckPasswordAsync(user, loginDto.Password);
             if(!flag) throw new UnAuthorizedException();
 
+            var roles = await userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault();
+
             return new UserResultDto()
             {
                 DisplayName = user.DisplayName,
+                Role = role,
                 Token = await GenerateJwtTokenAsync(user)
             };
         }
 
         public async Task<UserResultDto> RegisterAsync(RegisterDto registerDto)
         {
-            var user = new AppUser()
+            if (registerDto == null) throw new ArgumentNullException(nameof(registerDto));
+            if (userManager == null) throw new InvalidOperationException("UserManager is not configured.");
+            if (roleManager == null) throw new InvalidOperationException("RoleManager is not configured.");
+
+            // Normalize inputs
+            var userName = (registerDto.UserName ?? string.Empty).Trim();
+            var displayName = (registerDto.DisplayName ?? string.Empty).Trim();
+            var requestedRole = string.IsNullOrWhiteSpace(registerDto.Role) ? null : registerDto.Role.Trim();
+
+            // Check username uniqueness before creating
+            var existing = await userManager.FindByNameAsync(userName);
+            if (existing != null)
+                throw new ValidationException(new[] { "UserName already exists." });
+
+            // SECURITY: Validate the requested role exists BEFORE creating the user
+            if (!string.IsNullOrEmpty(requestedRole))
             {
-                DisplayName = registerDto.DisplayName,
-                UserName = registerDto.UserName
+                var roleExists = await roleManager.RoleExistsAsync(requestedRole);
+                if (!roleExists)
+                    throw new RoleNotFoundException(requestedRole); // or a ValidationException
+            }
+
+            var user = new AppUser
+            {
+                UserName = userName,
+                DisplayName = displayName
             };
-            var result = await userManager.CreateAsync(user, registerDto.Password);
-            if (!result.Succeeded)
+
+            // Create user
+            var createResult = await userManager.CreateAsync(user, registerDto.Password);
+            if (!createResult.Succeeded)
             {
-                var errors = result.Errors.Select(errors => errors.Description);
+                var errors = createResult.Errors.Select(e => e.Description);
                 throw new ValidationException(errors);
             }
-            if(!string.IsNullOrEmpty(registerDto.Role))
-            {
-                var roleExists = await roleManager.RoleExistsAsync(registerDto.Role);
-                if (!roleExists)
-                    throw new RoleNotFoundException(registerDto.Role);
 
-                var roleAssignResult = await userManager.AddToRoleAsync(user, registerDto.Role);
-                if(!roleAssignResult.Succeeded)
+            // If a role was requested, try to assign it.
+            if (!string.IsNullOrEmpty(requestedRole))
+            {
+                var roleAssignResult = await userManager.AddToRoleAsync(user, requestedRole);
+                if (!roleAssignResult.Succeeded)
                 {
-                    var errors = roleAssignResult.Errors.Select(errors => errors.Description);
+                    // Cleanup: try to delete the created user to avoid orphan accounts
+                    try
+                    {
+                        await userManager.DeleteAsync(user);
+                    }
+                    catch(Exception ex) 
+                    {
+                        
+                    }
+
+                    var errors = roleAssignResult.Errors.Select(e => e.Description);
                     throw new ValidationException(errors);
                 }
-
             }
 
-            return new UserResultDto()
+            // Get the assigned role(s) from the store (don't trust client input)
+            var roles = await userManager.GetRolesAsync(user);
+            var primaryRole = roles.FirstOrDefault(); // أو رجّع List<string> لو عايز كل الأدوار
+
+            // Generate token (GenerateJwtTokenAsync already reads roles via userManager.GetRolesAsync inside)
+            var token = await GenerateJwtTokenAsync(user);
+
+            return new UserResultDto
             {
                 DisplayName = user.DisplayName,
-                Token = await GenerateJwtTokenAsync(user)
+                Role = primaryRole,
+                Token = token
             };
         }
+
 
         public async Task ChangePasswordAsync(ChangePasswordDto changePasswordDto)
         {
