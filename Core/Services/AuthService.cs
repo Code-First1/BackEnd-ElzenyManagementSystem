@@ -31,7 +31,7 @@ namespace Services
         public async Task<UserResultDto> LoginAsync(LoginDto loginDto)
         {
             var user = await userManager.FindByNameAsync(loginDto.UserName);
-            if (userManager is null) throw new UnAuthorizedException();
+            if (user == null) throw new UserNotFoundException(loginDto.UserName);
 
             var flag = await userManager.CheckPasswordAsync(user, loginDto.Password);
             if(!flag) throw new UnAuthorizedException();
@@ -121,8 +121,44 @@ namespace Services
             };
         }
 
+        public async Task<UserProfileDto> GetCurrentUserAsync(string userName)
+        {
+            var user = await userManager.FindByNameAsync(userName);
+            if (user == null)
+                throw new UserNotFoundException(userName);
 
-        public async Task ChangePasswordAsync(ChangePasswordDto changePasswordDto)
+            var roles = await userManager.GetRolesAsync(user);
+            var primaryRole = roles.FirstOrDefault();
+
+            return new UserProfileDto
+            {
+                UserName = user.UserName,
+                DisplayName = user.DisplayName,
+                Role = primaryRole
+            };
+        }
+
+        public async Task<IEnumerable<UserProfileDto>> GetAllUsersAsync()
+        {
+            var users = userManager.Users.ToList();
+            var result = new List<UserProfileDto>();
+
+            foreach(var user in users)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                result.Add(new UserProfileDto 
+                {
+                    UserName = user.UserName,
+                    DisplayName= user.DisplayName,
+                    Role = roles.FirstOrDefault()
+                });
+            }
+
+            return result;
+            
+        }
+
+        public async Task<bool> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
         {
             var user = await userManager.FindByNameAsync(changePasswordDto.UserName);
             if (user == null)
@@ -141,6 +177,7 @@ namespace Services
 
             }
 
+            return true;
         }
         private async Task<string> GenerateJwtTokenAsync(AppUser user)
         {

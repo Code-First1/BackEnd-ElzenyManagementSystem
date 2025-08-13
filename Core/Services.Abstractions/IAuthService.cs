@@ -12,6 +12,9 @@ namespace Services.Abstractions
     {
         Task<UserResultDto> LoginAsync(LoginDto loginDto);
         Task<UserResultDto> RegisterAsync(RegisterDto registerDto);
-        Task ChangePasswordAsync(ChangePasswordDto changePasswordDto);
+        Task<bool> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
+        Task<UserProfileDto> GetCurrentUserAsync(string userName);
+        Task<IEnumerable<UserProfileDto>> GetAllUsersAsync();
+
     }
 }

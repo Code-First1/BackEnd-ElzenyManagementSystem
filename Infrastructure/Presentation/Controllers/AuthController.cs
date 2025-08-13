@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Shared.DTOs.Auth;
@@ -9,6 +10,7 @@ using Shared.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,23 +22,70 @@ namespace Presentation.Controllers
     {
         //login
         [HttpPost(template:"login")] //POST /api/auth/login
+        [AllowAnonymous]
         [ProducesResponseType<UserResultDto>(StatusCodes.Status200OK, Type = typeof(UserResultDto))]
         [ProducesResponseType<UserResultDto>(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
         [ProducesResponseType<UserResultDto>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var result = await serviceManager.AuthService.LoginAsync(loginDto);
-            return Ok(result);
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var resul = await serviceManager.AuthService.LoginAsync(loginDto);
+            return Ok(resul);
+
         }
+
         //register
         [HttpPost(template: "register")] //POST /api/auth/register
+        [AllowAnonymous]
         [ProducesResponseType<UserResultDto>(StatusCodes.Status200OK, Type = typeof(UserResultDto))]
         [ProducesResponseType<UserResultDto>(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
         [ProducesResponseType<UserResultDto>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var result = await serviceManager.AuthService.RegisterAsync(registerDto);
             return Ok(result);
+        }
+
+        [HttpPost("ChangePassword")]
+        [Authorize]
+        [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await serviceManager.AuthService.ChangePasswordAsync(changePasswordDto);
+            return NoContent();
+        }
+
+        [HttpGet("GetProfile")]
+        [Authorize]
+        [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<UserProfileDto>> GetCurrentUserJ()
+        {
+            var userName = User.FindFirstValue("user_name");
+            if(string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await serviceManager.AuthService.GetCurrentUserAsync(userName);
+            return Ok(user);
+        }
+
+        [HttpGet("GetAllUsers")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(IEnumerable<UserProfileDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<UserProfileDto>), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<UserProfileDto>>> GetAllUsers()
+        {
+            var users = await serviceManager.AuthService.GetAllUsersAsync();
+            return Ok(users);
         }
     }
 }
