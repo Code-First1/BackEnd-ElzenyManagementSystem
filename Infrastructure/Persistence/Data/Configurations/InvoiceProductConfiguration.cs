@@ -14,6 +14,10 @@ namespace Persistence.Data.Configurations
         public void Configure(EntityTypeBuilder<InvoiceProduct> builder)
         {
             builder
+                .Property(e => e.UnitPrice)
+                .HasColumnType("decimal(18,2)");
+
+            builder
                 .HasOne(ii => ii.Invoice)
                 .WithMany(i => i.InvoiceProducts)
                 .HasForeignKey(ii => ii.InvoiceId);

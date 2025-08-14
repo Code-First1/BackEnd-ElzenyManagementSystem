@@ -63,6 +63,24 @@ namespace Persistence
                 }
 
                 //Seeding Products From Json Files
+                if (!_context.SubCategories.Any())
+                {
+                    //1. Read All Data From products.json as String
+                    var subCategoriesData = await File.ReadAllTextAsync(@"..\Infrastructure\Persistence\Seeding\subcategories.json");
+
+                    //2. Transform String To C# Object [List<Product>]
+                    var subCategories = JsonSerializer.Deserialize<List<SubCategory>>(subCategoriesData);
+
+                    //3. Add List<Product> To Database
+                    if (subCategories is not null && subCategories.Any())
+                    {
+                        await _context.SubCategories.AddRangeAsync(subCategories);
+                        await _context.SaveChangesAsync();
+
+                    }
+                }
+
+                //Seeding SubCategories From Json Files
                 if (!_context.Products.Any())
                 {
                     //1. Read All Data From products.json as String

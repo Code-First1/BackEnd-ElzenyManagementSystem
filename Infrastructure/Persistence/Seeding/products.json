@@ -1,34 +1,38 @@
 [
   {
-    "name": "Wireless Mouse",
-    "description": "Ergonomic wireless mouse with adjustable DPI settings.",
-    "unit": "Piece",
-    "price": 150.75,
-    "pricePerUnit": 150.75,
-    "categoryId": 1
+    "Name": "Wireless Mouse",
+    "Description": "Ergonomic wireless mouse with adjustable DPI settings.",
+    "Unit": "Piece",
+    "PricePerUnit": 150.75,
+    "PictureUrl": null,
+    "CategoryId": 1,
+    "SubCategoryId": 1
   },
   {
-    "name": "Organic Bananas",
-    "description": "Fresh organic bananas, approx. 1kg bunch.",
-    "unit": "Piece",
-    "price": 30.00,
-    "pricePerUnit": 30.00,
-    "categoryId": 2
+    "Name": "Organic Bananas",
+    "Description": "Fresh organic bananas, approx. 1kg bunch.",
+    "Unit": "Piece",
+    "PricePerUnit": 30.00,
+    "PictureUrl": null,
+    "CategoryId": 2,
+    "SubCategoryId": 2
   },
   {
-    "name": "Wooden Desk",
-    "description": "Spacious wooden desk with 3 drawers.",
-    "unit": "Piece",
-    "price": 950.00,
-    "pricePerUnit": 950.00,
-    "categoryId": 3
+    "Name": "Wooden Desk",
+    "Description": "Spacious wooden desk with 3 drawers.",
+    "Unit": "Piece",
+    "PricePerUnit": 950.00,
+    "PictureUrl": null,
+    "CategoryId": 3,
+    "SubCategoryId": 3
   },
   {
-    "name": "Programming in C#",
-    "description": "Beginner to advanced C# guide.",
-    "unit": "Piece",
-    "price": 120.00,
-    "pricePerUnit": 120.00,
-    "categoryId": 4
+    "Name": "Programming in C#",
+    "Description": "Beginner to advanced C# guide.",
+    "Unit": "Piece",
+    "PricePerUnit": 120.00,
+    "PictureUrl": null,
+    "CategoryId": 4,
+    "SubCategoryId": 4
   }
 ]

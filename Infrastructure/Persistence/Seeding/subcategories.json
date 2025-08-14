@@ -1,0 +1,18 @@
+[
+  {
+    "Name": "Computer Accessories",
+    "CategoryId": 1
+  },
+  {
+    "Name": "Fruits",
+    "CategoryId": 2
+  },
+  {
+    "Name": "Desks",
+    "CategoryId": 3
+  },
+  {
+    "Name": "Programming",
+    "CategoryId": 4
+  }
+]

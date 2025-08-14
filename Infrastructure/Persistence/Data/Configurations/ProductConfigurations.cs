@@ -34,6 +34,7 @@ namespace Persistence.Data.Configurations
                 .HasOne(p => p.SubCategory)
                 .WithMany(sc => sc.Products)
                 .HasForeignKey(p => p.SubCategoryId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
             
 
