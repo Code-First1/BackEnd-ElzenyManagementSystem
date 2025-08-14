@@ -24,12 +24,18 @@ namespace Domain.Models
 
         public string? PictureUrl { get; set; }
 
+
         //Forign Keys
         [Required(ErrorMessage = "Category is required.")]
         public int CategoryId { get; set; }
+        public int SubCategoryId { get; set; }
 
 
         //Navigation Properties
         public Category Category { get; set; } 
+        public SubCategory SubCategory { get; set; }
+        public IEnumerable<InventoryProduct> InventoryProducts { get; set; }
+        public IEnumerable<ShopProduct> ShopProducts { get; set; }
+
     }
 }

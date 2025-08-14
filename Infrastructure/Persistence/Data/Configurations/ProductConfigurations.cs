@@ -13,12 +13,29 @@ namespace Persistence.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
-            builder.HasOne(P => P.Category)
-                .WithMany()
-                .HasForeignKey(P => P.CategoryId);
+            builder
+                .Property(p => p.Name)
+                .IsRequired()
+                .HasMaxLength(200);
 
-            builder.Property(p => p.PricePerUnit)
-                   .HasPrecision(18, 2);
+            builder
+                .Property(p => p.PricePerUnit)
+                .HasPrecision(18, 2);
+
+            //Realations
+
+            builder
+                .HasOne(P => P.Category)
+                .WithMany()
+                .HasForeignKey(P => P.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder
+                .HasOne(p => p.SubCategory)
+                .WithMany(sc => sc.Products)
+                .HasForeignKey(p => p.SubCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
 
         }
     }

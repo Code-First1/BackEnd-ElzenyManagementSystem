@@ -16,7 +16,12 @@ namespace Persistence.Data
             
         }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<SubCategory> SubCategories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<InventoryProduct> InventoryProducts { get; set; }
+        public DbSet<Shop> Shop { get; set; }
+        public DbSet<ShopProduct> ShopProducts { get; set; }
+       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

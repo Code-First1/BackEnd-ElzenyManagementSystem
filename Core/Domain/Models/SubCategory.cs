@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 
 namespace Domain.Models
 {
-    public class Category : BaseEntity<int>
+    public class SubCategory : BaseEntity<int>
     {
         [Required(ErrorMessage = "Category name is required.")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Category name must be between 2 and 100 characters.")]
         public string Name { get; set; }
-
-        public IEnumerable<SubCategory> SubCategories { get; set; }
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
+        public IEnumerable<Product> Products { get; set; }
     }
 }
