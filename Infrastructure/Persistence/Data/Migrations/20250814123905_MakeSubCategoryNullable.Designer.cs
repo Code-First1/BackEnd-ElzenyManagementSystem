@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Data;
 
@@ -11,9 +12,11 @@ using Persistence.Data;
 namespace Persistence.Data.Migrations
 {
     [DbContext(typeof(ElzenyDbContext))]
-    partial class ElzenyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250814123905_MakeSubCategoryNullable")]
+    partial class MakeSubCategoryNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +40,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Domain.Models.Identity.AppUser", b =>
@@ -93,7 +96,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppUser", (string)null);
+                    b.ToTable("AppUser");
                 });
 
             modelBuilder.Entity("Domain.Models.InventoryProduct", b =>
@@ -117,7 +120,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("InventoryProducts", (string)null);
+                    b.ToTable("InventoryProducts");
                 });
 
             modelBuilder.Entity("Domain.Models.Invoice", b =>
@@ -147,7 +150,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Invoices", (string)null);
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("Domain.Models.InvoiceProduct", b =>
@@ -176,7 +179,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("InvoicesProduct", (string)null);
+                    b.ToTable("InvoicesProduct");
                 });
 
             modelBuilder.Entity("Domain.Models.Product", b =>
@@ -217,7 +220,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("SubCategoryId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Domain.Models.Shop", b =>
@@ -235,7 +238,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shop", (string)null);
+                    b.ToTable("Shop");
                 });
 
             modelBuilder.Entity("Domain.Models.ShopProduct", b =>
@@ -273,7 +276,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("ShopId");
 
-                    b.ToTable("ShopProducts", (string)null);
+                    b.ToTable("ShopProducts");
                 });
 
             modelBuilder.Entity("Domain.Models.SubCategory", b =>
@@ -296,7 +299,7 @@ namespace Persistence.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("SubCategories", (string)null);
+                    b.ToTable("SubCategories");
                 });
 
             modelBuilder.Entity("Domain.Models.InventoryProduct", b =>

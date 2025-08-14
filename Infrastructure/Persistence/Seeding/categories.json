@@ -1,14 +1,6 @@
 [
-  {
-    "Name": "Electronics"
-  },
-  {
-    "Name": "Groceries"
-  },
-  {
-    "Name": "Books"
-  },
-  {
-    "Name": "Furniture"
-  }
+  { "Name": "Electronics" },
+  { "Name": "Groceries" },
+  { "Name": "Furniture" },
+  { "Name": "Books" }
 ]
