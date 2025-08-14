@@ -10,7 +10,10 @@ namespace Domain.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        //Navigation Properties
         public IEnumerable<ShopProduct> ShopProducts { get; set; }
+        public IEnumerable<Invoice> Invoices { get; set; }
         
     }
 }

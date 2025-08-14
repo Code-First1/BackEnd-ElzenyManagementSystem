@@ -36,6 +36,7 @@ namespace Domain.Models
         public SubCategory SubCategory { get; set; }
         public IEnumerable<InventoryProduct> InventoryProducts { get; set; }
         public IEnumerable<ShopProduct> ShopProducts { get; set; }
+        public IEnumerable<InvoiceProduct> InvoiceProducts { get; set; }
 
     }
 }
