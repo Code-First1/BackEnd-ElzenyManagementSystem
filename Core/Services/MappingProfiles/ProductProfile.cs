@@ -18,6 +18,7 @@ namespace Services.MappingProfiles
             CreateMap<Product, ProductResultDto>()
             .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Unit.ToString()))
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
+            .ForMember(dest => dest.SubCategoryName, opt => opt.MapFrom(src => src.SubCategory != null ? src.SubCategory.Name : null))
             .ForMember(d => d.PictureUrl , o => o.MapFrom<PictureUrlResolver>());
 
             CreateMap<ProductCreateDto, Product>()

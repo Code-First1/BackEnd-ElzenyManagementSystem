@@ -13,7 +13,7 @@ namespace Services.MappingProfiles
     {
         public CategoryProfile()
         {
-            CreateMap<Category, CategoryResultDto>();
+            CreateMap<Category, CategoryResultDto>().ReverseMap();
             CreateMap<Category,CategoryCreateDto>();
             CreateMap<Category,CategoryUpdateDto>();
         }

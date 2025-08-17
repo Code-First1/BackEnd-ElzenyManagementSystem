@@ -1,6 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Shared.DTOs.Category;
+using Shared.DTOs.Product;
+using Shared.ErrorModels;
+using Shared.Response;
+using Shared.SpecificationsParam.Category;
+using Shared.SpecificationsParam.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +19,22 @@ namespace Presentation.Controllers
     [Route(template: "api/[controller]")]
     public class CategoriesController(IServiceManager serviceManager) : ControllerBase
     {
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [HttpGet] //GET: /api/categories
+        [ProducesResponseType<PaginationResponse<CategoryResultDto>>(StatusCodes.Status200OK, Type =  typeof(PaginationResponse<CategoryResultDto>))]
+        [ProducesResponseType<PaginationResponse<CategoryResultDto>>(StatusCodes.Status500InternalServerError, Type =  typeof(ErrorDetails))]
+        [ProducesResponseType<PaginationResponse<CategoryResultDto>>(StatusCodes.Status400BadRequest, Type =  typeof(ErrorDetails))]
+        public async Task<ActionResult<PaginationResponse<CategoryResultDto>>> GetAll([FromQuery] CategorySpecificationsParameters categorySpecsParams)
         {
-            var result = await serviceManager.CategoryService.GetCategoriesAsync();
+            var result = await serviceManager.CategoryService.GetCategoriesAsync(categorySpecsParams);
             return Ok(result);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        [ProducesResponseType<CategoryResultDto>(StatusCodes.Status200OK, Type = typeof(CategoryResultDto))]
+        [ProducesResponseType<CategoryResultDto>(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
+        [ProducesResponseType<CategoryResultDto>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
+        [ProducesResponseType<CategoryResultDto>(StatusCodes.Status404NotFound, Type = typeof(ErrorDetails))]
+        public async Task<ActionResult<CategoryResultDto>> GetById(int id)
         {
             var result = await serviceManager.CategoryService.GetCategoryByIdAsync(id);
             return result is null ? NotFound() : Ok(result);

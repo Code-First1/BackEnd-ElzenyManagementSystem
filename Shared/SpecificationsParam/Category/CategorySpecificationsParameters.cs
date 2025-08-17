@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.SpecificationsParam.Product
+namespace Shared.SpecificationsParam.Category
 {
-    public class ProductSpecificationsParamters
+    public class CategorySpecificationsParameters
     {
-        public int? CategoryId {  get; set; }
-        public int? SubCategoryId { get; set; }
-        public string? sort {  get; set; }
-        public string? Search {  get; set; }
+        public string? sort { get; set; }
+        public string? Search { get; set; }
 
         private int _pageIndex = 1;
         private int _pageSize = 10;
