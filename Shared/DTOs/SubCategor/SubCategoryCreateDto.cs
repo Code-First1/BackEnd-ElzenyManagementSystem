@@ -5,13 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.DTOs.Category
+namespace Shared.DTOs.SubCategor
 {
-    public class CategoryCreateDto
+    public class SubCategoryCreateDto
     {
-        [Required(ErrorMessage = "Category name is required.")]
+        [Required(ErrorMessage = "SubCategory name is required.")]
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Category Id is required.")]
+        public int CategoryId { get; set; }
     }
 }

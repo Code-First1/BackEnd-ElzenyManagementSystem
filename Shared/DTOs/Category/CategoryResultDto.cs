@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared.DTOs.SubCategor;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace Shared.DTOs.Category
         [Required(ErrorMessage = "Category name is required.")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Category name must be between 2 and 100 characters.")]
         public string Name { get; set; }
+        public IEnumerable<SubCategoryResultDto> SubCategories { get; set; }
     }
 }

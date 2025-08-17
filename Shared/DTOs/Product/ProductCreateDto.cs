@@ -24,5 +24,7 @@ namespace Shared.DTOs.Product
         public string? PictureUrl { get; set; }
 
         public int CategoryId { get; set; }
+
+        public int? SubCategoryId { get; set; }
     }
 }

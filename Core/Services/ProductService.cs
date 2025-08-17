@@ -18,7 +18,7 @@ namespace Services
     {
         public async Task<PaginationResponse<ProductResultDto>> GetProductsAsync(ProductSpecificationsParamters productSpecsParams)
         {
-            var spec = new ProductWithCategoriesSpecification(productSpecsParams);
+            var spec = new ProductWithCategoriesAndSubCategoriesSpecification(productSpecsParams);
 
 
             var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(spec);
@@ -33,7 +33,7 @@ namespace Services
 
         public async Task<ProductResultDto?> GetProductByIdAsync(int id)
         {
-            var spec = new ProductWithCategoriesSpecification(id);
+            var spec = new ProductWithCategoriesAndSubCategoriesSpecification(id);
 
             var product = await unitOfWork.GetRepository<Product, int>().GetAsync(spec);
             if (product is null) throw new ProductNotFoundExceptions(id);

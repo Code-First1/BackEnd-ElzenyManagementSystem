@@ -26,5 +26,6 @@ namespace Shared.DTOs.Product
         public string? PictureUrl { get; set; }
 
         public string CategoryName { get; set; }
+        public string SubCategoryName { get; set; }
     }
 }
