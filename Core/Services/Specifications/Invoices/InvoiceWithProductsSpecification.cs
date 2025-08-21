@@ -17,7 +17,7 @@ namespace Services.Specifications.Invoices
             : base(
                 i =>
                     (!invoiceParams.ShopId.HasValue || i.ShopId == invoiceParams.ShopId) &&
-                    (!string.IsNullOrEmpty(i.UserId) || i.UserId == invoiceParams.UserId) &&
+                    //(string.IsNullOrEmpty(i.UserId) || i.UserId == invoiceParams.UserId) &&
                     (!invoiceParams.CreateAt.HasValue || i.CreateAt.Date == invoiceParams.CreateAt.Value.Date) &&
                     (string.IsNullOrEmpty(invoiceParams.Search) ||
                         i.User.UserName.ToLower().Contains(invoiceParams.Search.ToLower()) ||
@@ -36,7 +36,8 @@ namespace Services.Specifications.Invoices
             AddInclude(i => i.User);
             AddInclude(i => i.Shop);
             AddInclude(i => i.InvoiceProducts);
-           
+
+
         }
 
         private void ApplySorting(string? sort)

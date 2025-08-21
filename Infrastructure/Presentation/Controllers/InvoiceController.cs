@@ -21,7 +21,7 @@ namespace Presentation.Controllers
     public class InvoicesController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet] //GET: /api/Invoices
-        [Authorize]
+      
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status200OK, Type = typeof(PaginationResponse<InvoiceResultDto>))]
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
@@ -31,7 +31,7 @@ namespace Presentation.Controllers
             return Ok(result);
         }
         [HttpGet("{id:int}")]
-        [Authorize]
+   
         [ProducesResponseType(typeof(InvoiceResultDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]

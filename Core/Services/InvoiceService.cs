@@ -130,13 +130,19 @@ namespace Services
      
         public async Task<PaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams)
         {
+          
             var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
             var invoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
+            Console.WriteLine($"Invoices count: {invoices.Count()}");
+            if (!invoices.Any())
+                return new PaginationResponse<InvoiceResultDto>(invoiceSpecsParams.PageIndex, invoiceSpecsParams.PageSize, 0, new List<InvoiceResultDto>());
+
+            var result = mapper.Map<IEnumerable<InvoiceResultDto>>(invoices);
 
             var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
             var count = await unitOfWork.GetRepository<Invoice, int>().CountAsync(specCount);
 
-            var result = mapper.Map<IEnumerable<InvoiceResultDto>>(invoices);
+            
 
             return new PaginationResponse<InvoiceResultDto>(
                 pageIndex: invoiceSpecsParams.PageIndex,
