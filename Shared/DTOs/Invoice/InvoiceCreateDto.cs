@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,8 +17,8 @@ namespace Shared.DTOs.Invoice
             [Required]
             public string UserId { get; set; }
 
-          
-            public decimal TotalPrice { get; set; }
+         
+            //public decimal TotalPrice { get; set; }
 
            
             [Required]

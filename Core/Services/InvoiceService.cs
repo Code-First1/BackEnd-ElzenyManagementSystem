@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
+using Domain.Enums;
 using Domain.Models;
+using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Services.Specifications.Invoices;
 using Shared.DTOs.Invoice;
@@ -11,22 +13,80 @@ namespace Services
 {
     public class InvoiceService(IUnitOfWork unitOfWork, IMapper mapper) : IInvoiceService
     {
-      
-        public async Task<int> AddInvoiceAsync(InvoiceCreateDto dto)
+
+        public async Task<int> AddInvoiceAsync([FromBody]InvoiceCreateDto dto)
         {
-           
-            var invoice = mapper.Map<Invoice>(dto);
+            var invoice = new Invoice
+            {
+                ShopId = dto.ShopId,
+                UserId = dto.UserId,
+                CreateAt = DateTime.UtcNow,
+                InvoiceProducts = new List<InvoiceProduct>()
+            };
 
-         
-            invoice.TotalPrice = dto.Items.Sum(i => i.TotalPricePerItem);
+            var productRepo = unitOfWork.GetRepository<Product, int>();
+            var inventoryRepo = unitOfWork.GetRepository<InventoryProduct, int>();
+            var shopRepo= unitOfWork.GetRepository<Shop, int>();
+            var shopProductRepo = unitOfWork.GetRepository<ShopProduct, int>();
 
-            await unitOfWork.GetRepository<Invoice, int>().AddAsync(invoice);
-           
+            var allInventory = await inventoryRepo.GetAllAsync();
+            var allShop= await shopRepo.GetAllAsync();
 
+            foreach (var itemDto in dto.Items)
+            {
+                
+                var product = await productRepo.GetAsync(itemDto.ProductId);
+                if (product == null)
+                    throw new Exception($"Product with Id {itemDto.ProductId} not found");
+                if(itemDto.Unit== Unit.Roll)
+                {
+                    var inventoryProduct = allInventory.FirstOrDefault(x => x.ProductId == product.Id);
+                    if (inventoryProduct == null)
+                        throw new Exception($"Inventory record not found for Product {product.Id}");
+
+
+                    if (inventoryProduct.Quantity < itemDto.Quantity)
+                        throw new Exception($"Not enough stock for product {product.Id}");
+                    inventoryProduct.Quantity -= itemDto.Quantity;
+                    inventoryRepo.Update(inventoryProduct);
+
+                }
+                else if (itemDto.Unit == Unit.Piece || itemDto.Unit == Unit.Meter)
+                {
+                    var allShopProducts = await shopProductRepo.GetAllAsync();
+                    var shopProduct = allShopProducts.FirstOrDefault(
+                        sp => sp.ProductId == product.Id && sp.ShopId == dto.ShopId
+                    );
+
+                    if (shopProduct == null)
+                        throw new Exception($"ShopProduct not found for Product {product.Id} in Shop {dto.ShopId}");
+
+                    if (shopProduct.Quantity < itemDto.Quantity)
+                        throw new Exception($"Not enough stock in Shop {dto.ShopId} for product {product.Id}");
+
+                    shopProduct.Quantity -= itemDto.Quantity;
+                    shopProductRepo.Update(shopProduct);
+
+                }
+                var invoiceItem = new InvoiceProduct
+                {
+                    ProductId = product.Id,
+                    Quantity = itemDto.Quantity,
+                    UnitPrice = product.PricePerUnit
+                };
+
+                invoice.InvoiceProducts.Add(invoiceItem);
+            }
+            invoice.TotalPrice = invoice.InvoiceProducts.Sum(i => i.UnitPrice * i.Quantity);
+            var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
+            await invoiceRepo.AddAsync(invoice);
+            await unitOfWork.SaveChangesAsync();
             return invoice.Id;
         }
 
-      
+
+
+
         public async Task<bool> UpdateInvoiceAsync(int id, InvoiceUpdateDto dto)
         {
             var repo = unitOfWork.GetRepository<Invoice, int>();

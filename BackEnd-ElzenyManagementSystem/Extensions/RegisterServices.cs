@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Persistence;
@@ -17,33 +16,30 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
 {
     public static class RegisterServices
     {
-        public static IServiceCollection RegisterAllServices(this IServiceCollection services,IConfiguration configuration)
+        public static IServiceCollection RegisterAllServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // Add services to the container.
             services.AddCorsServices();
-
             services.AddBuiltInServices();
             services.AddSwaggerServices();
-
             services.AddInfrastructureServices(configuration);
             services.AddIdentityService();
-
             services.AddApplicatinServices(configuration);
-
             services.ConfigureJwtServices(configuration);
-
             services.ConfigureServices();
-
-
             return services;
         }
 
         private static IServiceCollection AddBuiltInServices(this IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+                });
 
             return services;
         }
+
         private static IServiceCollection AddCorsServices(this IServiceCollection services)
         {
             services.AddCors(options =>
@@ -78,7 +74,6 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
                         ValidateAudience = true,
                         ValidateIssuerSigningKey = true,
                         ValidateLifetime = true,
-
                         ValidIssuer = jwtOptions.Issuer,
                         ValidAudience = jwtOptions.Audience,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
@@ -86,9 +81,9 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
                 });
             return services;
         }
+
         private static IServiceCollection AddSwaggerServices(this IServiceCollection services)
         {
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>
             {
@@ -123,6 +118,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
 
             return services;
         }
+
         private static IServiceCollection ConfigureServices(this IServiceCollection services)
         {
             services.Configure<ApiBehaviorOptions>(config =>
@@ -153,10 +149,9 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
         {
             services
                 .AddIdentity<AppUser, IdentityRole>()
-                .AddEntityFrameworkStores <ElzenyIdentityDbContext>();
+                .AddEntityFrameworkStores<ElzenyIdentityDbContext>();
 
             return services;
         }
-
     }
 }

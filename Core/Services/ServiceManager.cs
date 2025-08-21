@@ -25,6 +25,7 @@ namespace Services
         public IProductService ProductService { get; } = new ProductService(unitOfWork, mapper);
         public ICategoryService CategoryService { get; } = new CategoryService(unitOfWork, mapper);
         public ISubCategoryService SubCategoryService { get; } = new SubCategoryService(unitOfWork, mapper);
+        public IInvoiceService InvoiceService { get; }= new InvoiceService(unitOfWork, mapper);
         public IAuthService AuthService { get; } = new AuthService(userManager, options, roleManager);
     }
 }

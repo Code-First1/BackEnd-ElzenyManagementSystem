@@ -20,7 +20,7 @@ namespace Domain.Models
 
 
         // Navigation Property 
-        public IEnumerable<InvoiceProduct> InvoiceProducts { get; set; }
+        public ICollection<InvoiceProduct> InvoiceProducts { get; set; }
         public Shop Shop { get; set; }
         public AppUser User { get; set; }
 

@@ -8,8 +8,8 @@ namespace Domain.Enums
 {
     public enum Unit
     {
-        Meter,
-        Piece,
-        Roll
+        Meter=0,
+        Piece=1,
+        Roll=2
     }
 }
