@@ -5,19 +5,16 @@ namespace Services.Specifications.Invoices
 {
     public class InvoiceWithProductsSpecification : BaseSpecifications<Invoice, int>
     {
-       
         public InvoiceWithProductsSpecification(int id)
             : base(i => i.Id == id)
         {
             ApplyInclude();
         }
 
-      
         public InvoiceWithProductsSpecification(InvoiceSpecificationsParamters invoiceParams)
             : base(
                 i =>
                     (!invoiceParams.ShopId.HasValue || i.ShopId == invoiceParams.ShopId) &&
-                    //(string.IsNullOrEmpty(i.UserId) || i.UserId == invoiceParams.UserId) &&
                     (!invoiceParams.CreateAt.HasValue || i.CreateAt.Date == invoiceParams.CreateAt.Value.Date) &&
                     (string.IsNullOrEmpty(invoiceParams.Search) ||
                         i.User.UserName.ToLower().Contains(invoiceParams.Search.ToLower()) ||
@@ -33,10 +30,10 @@ namespace Services.Specifications.Invoices
 
         private void ApplyInclude()
         {
-            AddInclude(i => i.User);
-            AddInclude(i => i.Shop);
+            //AddInclude(i => i.User);
+            //AddInclude(i => i.Shop);
             AddInclude(i => i.InvoiceProducts);
-
+            AddInclude("InvoiceProduct.Product");
 
         }
 

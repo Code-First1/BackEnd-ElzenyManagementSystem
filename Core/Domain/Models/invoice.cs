@@ -21,6 +21,7 @@ namespace Domain.Models
 
         // Navigation Property 
         public List<InvoiceProduct> InvoiceProducts { get; set; }
+        //public List<Product> Products { get; set; }
         public Shop Shop { get; set; }
         public AppUser User { get; set; }
 

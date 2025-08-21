@@ -10,7 +10,7 @@ namespace Shared.DTOs.Invoice
     public class InvoiceResultDto
     {
         public int Id { get; set; }
-        public IEnumerable<InvoiceProductResultDto> Products { get; set; }
+        public IEnumerable<InvoiceProductResultDto> InvoiceProduct { get; set; }
         // other properties...
     }
 }

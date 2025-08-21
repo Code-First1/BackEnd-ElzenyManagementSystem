@@ -2,20 +2,17 @@
 using Domain.Models;
 using Shared.DTOs.Invoice;
 
-namespace Services.MappingProfiles
+public class InvoiceProfile : Profile
 {
-    public class InvoiceProfile : Profile
+    public InvoiceProfile()
     {
-        public InvoiceProfile()
-        {
-            // Mapping Invoice → InvoiceResultDto
-            CreateMap<Invoice, InvoiceResultDto>()
-                .ForMember(dest => dest.Products,
-                           opt => opt.MapFrom(src => src.InvoiceProducts));
+        CreateMap<Invoice, InvoiceResultDto>()
+            .ForMember(dest => dest.InvoiceProduct, opt => opt.MapFrom(src => src.InvoiceProducts));
 
-            // Mapping InvoiceProduct → InvoiceProductResultDto
-            CreateMap<InvoiceProduct, InvoiceProductResultDto>();
-        }
+        CreateMap<InvoiceProduct, InvoiceProductResultDto>()
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+            .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
+            .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Product.Unit))
+            .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
     }
 }
-
