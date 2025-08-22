@@ -10,6 +10,8 @@ namespace Shared.DTOs.Invoice
     public class InvoiceResultDto
     {
         public int Id { get; set; }
+
+        public decimal Total { get; set; }
         public IEnumerable<InvoiceProductResultDto> InvoiceProduct { get; set; }
         // other properties...
     }

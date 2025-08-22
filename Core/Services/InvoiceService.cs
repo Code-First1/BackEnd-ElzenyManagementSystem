@@ -14,7 +14,7 @@ namespace Services
     public class InvoiceService(IUnitOfWork unitOfWork, IMapper mapper) : IInvoiceService
     {
 
-        public async Task<int> AddInvoiceAsync([FromBody]InvoiceCreateDto dto)
+        public async Task<int> AddInvoiceAsync([FromBody] InvoiceCreateDto dto)
         {
             var invoice = new Invoice
             {
@@ -26,19 +26,19 @@ namespace Services
 
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var inventoryRepo = unitOfWork.GetRepository<InventoryProduct, int>();
-            var shopRepo= unitOfWork.GetRepository<Shop, int>();
+            var shopRepo = unitOfWork.GetRepository<Shop, int>();
             var shopProductRepo = unitOfWork.GetRepository<ShopProduct, int>();
 
             var allInventory = await inventoryRepo.GetAllAsync();
-            var allShop= await shopRepo.GetAllAsync();
+            var allShop = await shopRepo.GetAllAsync();
 
             foreach (var itemDto in dto.Items)
             {
-                
+
                 var product = await productRepo.GetAsync(itemDto.ProductId);
                 if (product == null)
                     throw new Exception($"Product with Id {itemDto.ProductId} not found");
-                if(itemDto.Unit== Unit.Roll)
+                if (itemDto.Unit == Unit.Roll)
                 {
                     var inventoryProduct = allInventory.FirstOrDefault(x => x.ProductId == product.Id);
                     if (inventoryProduct == null)
@@ -97,14 +97,14 @@ namespace Services
 
             mapper.Map(dto, invoice);
 
-          
+
 
             repo.Update(invoice);
-           
+
             return true;
         }
 
-     
+
         public async Task<bool> DeleteInvoiceAsync(int id)
         {
             var repo = unitOfWork.GetRepository<Invoice, int>();
@@ -114,7 +114,7 @@ namespace Services
                 return false;
 
             repo.Delete(invoice);
-           
+
             return true;
         }
 
@@ -127,14 +127,13 @@ namespace Services
             if (invoice == null)
                 return null;
 
-           
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var allProducts = await productRepo.GetAllAsync();
 
-           
             var result = mapper.Map<InvoiceResultDto>(invoice);
 
-          
+            decimal total = 0;
+
             foreach (var item in result.InvoiceProduct)
             {
                 var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
@@ -142,8 +141,15 @@ namespace Services
                 {
                     item.ProductName = product.Name;
                     item.ProductId = product.Id;
+                    item.Unit = product.Unit.ToString();
+                    item.pricePerUnit = product.PricePerUnit;
+
+                    var temp = product.PricePerUnit * item.Quantity;
+                    total += temp;
                 }
             }
+
+            result.Total = total;
 
             return result;
         }
@@ -163,16 +169,15 @@ namespace Services
                     new List<InvoiceResultDto>()
                 );
 
-         
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var allProducts = await productRepo.GetAllAsync();
 
-           
             var result = mapper.Map<IEnumerable<InvoiceResultDto>>(invoices);
 
-           
             foreach (var invoiceDto in result)
             {
+                decimal total = 0;
+
                 foreach (var item in invoiceDto.InvoiceProduct)
                 {
                     var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
@@ -180,8 +185,15 @@ namespace Services
                     {
                         item.ProductName = product.Name;
                         item.ProductId = product.Id;
+                        item.Unit =product.Unit.ToString();
+                        item.pricePerUnit = product.PricePerUnit;
+                        var temp = product.PricePerUnit * item.Quantity; 
+
+                        total += temp; 
                     }
                 }
+
+                invoiceDto.Total = total;
             }
 
             var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
@@ -194,6 +206,5 @@ namespace Services
                 data: result
             );
         }
-
     }
-}
+    }
