@@ -118,34 +118,74 @@ namespace Services
             return true;
         }
 
-     
+
         public async Task<InvoiceResultDto?> GetInvoiceByIdAsync(int id)
         {
             var spec = new InvoiceWithProductsSpecification(id);
             var invoice = await unitOfWork.GetRepository<Invoice, int>().GetAsync(spec);
 
-            return mapper.Map<InvoiceResultDto>(invoice);
-        }
-
-     
-        public async Task<PaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams)
-        {
-
-
-                var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
-            var invoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
-            Console.WriteLine($"Invoices count: {invoices.Count()}");
-            if (!invoices.Any())
-                return new PaginationResponse<InvoiceResultDto>(invoiceSpecsParams.PageIndex, invoiceSpecsParams.PageSize, 0, new List<InvoiceResultDto>());
+            if (invoice == null)
+                return null;
 
            
+            var productRepo = unitOfWork.GetRepository<Product, int>();
+            var allProducts = await productRepo.GetAllAsync();
 
+           
+            var result = mapper.Map<InvoiceResultDto>(invoice);
+
+          
+            foreach (var item in result.InvoiceProduct)
+            {
+                var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
+                if (product != null)
+                {
+                    item.ProductName = product.Name;
+                    item.ProductId = product.Id;
+                }
+            }
+
+            return result;
+        }
+
+
+
+        public async Task<PaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams)
+        {
+            var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
+            var invoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
+
+            if (!invoices.Any())
+                return new PaginationResponse<InvoiceResultDto>(
+                    invoiceSpecsParams.PageIndex,
+                    invoiceSpecsParams.PageSize,
+                    0,
+                    new List<InvoiceResultDto>()
+                );
+
+         
+            var productRepo = unitOfWork.GetRepository<Product, int>();
+            var allProducts = await productRepo.GetAllAsync();
+
+           
             var result = mapper.Map<IEnumerable<InvoiceResultDto>>(invoices);
+
+           
+            foreach (var invoiceDto in result)
+            {
+                foreach (var item in invoiceDto.InvoiceProduct)
+                {
+                    var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
+                    if (product != null)
+                    {
+                        item.ProductName = product.Name;
+                        item.ProductId = product.Id;
+                    }
+                }
+            }
 
             var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
             var count = await unitOfWork.GetRepository<Invoice, int>().CountAsync(specCount);
-
-            
 
             return new PaginationResponse<InvoiceResultDto>(
                 pageIndex: invoiceSpecsParams.PageIndex,
@@ -154,5 +194,6 @@ namespace Services
                 data: result
             );
         }
+
     }
 }
