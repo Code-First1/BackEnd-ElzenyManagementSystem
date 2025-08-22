@@ -107,16 +107,29 @@ namespace Services
 
         public async Task<bool> DeleteInvoiceAsync(int id)
         {
-            var repo = unitOfWork.GetRepository<Invoice, int>();
+            var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
+            var invoiceProductRepo = unitOfWork.GetRepository<InvoiceProduct, int>();
 
-            var invoice = await repo.GetAsync(id);
+            var invoice = await invoiceRepo.GetAsync(id);
             if (invoice == null)
                 return false;
 
-            repo.Delete(invoice);
+
+            var allInvoiceProducts = await invoiceProductRepo.GetAllAsync();
+            var invoiceProducts = allInvoiceProducts.Where(ip => ip.InvoiceId == id);
+
+            foreach (var item in invoiceProducts)
+            {
+                invoiceProductRepo.Delete(item);
+            }
+
+            invoiceRepo.Delete(invoice);
+
+            await unitOfWork.SaveChangesAsync();
 
             return true;
         }
+
 
 
         public async Task<InvoiceResultDto?> GetInvoiceByIdAsync(int id)

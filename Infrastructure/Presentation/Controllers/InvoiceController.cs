@@ -52,6 +52,22 @@ namespace Presentation.Controllers
             var newId = await serviceManager.InvoiceService.AddInvoiceAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = newId }, new { id = newId });
         }
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var deleted = await serviceManager.InvoiceService.DeleteInvoiceAsync(id);
+
+            if (!deleted)
+                return NotFound(new ErrorDetails { StatusCode = 404, ErrorMessage = "Invoice not found" });
+
+            return NoContent();
+        }
+
+
 
     }
 }
