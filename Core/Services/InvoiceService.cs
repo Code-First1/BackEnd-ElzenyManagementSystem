@@ -86,22 +86,33 @@ namespace Services
 
 
 
-
-        public async Task<bool> UpdateInvoiceAsync(int id, InvoiceUpdateDto dto)
+        public async Task<InvoiceResultDto?> UpdateInvoiceAsync(int id, InvoiceUpdateDto dto)
         {
-            var repo = unitOfWork.GetRepository<Invoice, int>();
+            var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
 
-            var invoice = await repo.GetAsync(id);
+       
+            var invoice = await invoiceRepo.GetAsync(id);
             if (invoice == null)
-                return false;
+                return null;
 
-            mapper.Map(dto, invoice);
+           
+            if (dto.ShopId.HasValue)
+                invoice.ShopId = dto.ShopId.Value;
+
+            if (!string.IsNullOrEmpty(dto.UserId))
+                invoice.UserId = dto.UserId;
+
+           
+            if (invoice.InvoiceProducts != null)
+                invoice.TotalPrice = invoice.InvoiceProducts.Sum(p => p.Quantity * p.UnitPrice);
 
 
+            invoiceRepo.Update(invoice);
+            
+            await unitOfWork.SaveChangesAsync();
 
-            repo.Update(invoice);
-
-            return true;
+            
+            return mapper.Map<InvoiceResultDto>(invoice);
         }
 
 

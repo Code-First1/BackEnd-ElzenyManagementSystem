@@ -66,6 +66,31 @@ namespace Presentation.Controllers
 
             return NoContent();
         }
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(typeof(InvoiceResultDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Update(int id, [FromBody] InvoiceUpdateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+           
+            var updatedInvoice = await serviceManager.InvoiceService.UpdateInvoiceAsync(id, dto);
+
+            if (updatedInvoice == null)
+                return NotFound(new ErrorDetails
+                {
+                    StatusCode = 404,
+                    ErrorMessage = "Invoice not found"
+                });
+
+
+            return Ok(updatedInvoice);
+        }
+
+
 
 
 

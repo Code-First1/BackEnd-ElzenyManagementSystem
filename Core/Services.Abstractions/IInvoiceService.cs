@@ -21,7 +21,7 @@ namespace Services.Abstractions
 
         Task<int> AddInvoiceAsync(InvoiceCreateDto dto);
 
-        Task<bool> UpdateInvoiceAsync(int id, InvoiceUpdateDto dto);
+        Task<InvoiceResultDto?> UpdateInvoiceAsync(int id, InvoiceUpdateDto dto);
 
         Task<bool> DeleteInvoiceAsync(int id);
     }
