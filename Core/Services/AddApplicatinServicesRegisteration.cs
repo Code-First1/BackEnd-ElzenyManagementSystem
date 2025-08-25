@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public static class AddApplicatinServicesRegisteration
+    public static class AddApplicationServicesRegisteration
     {
-        public static IServiceCollection AddApplicatinServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAutoMapper(cfg => cfg.AddMaps(typeof(AssemblyRef).Assembly));
             services.AddTransient<PictureUrlResolver>();

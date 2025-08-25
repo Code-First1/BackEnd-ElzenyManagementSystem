@@ -13,6 +13,13 @@ namespace Persistence.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<ShopProduct> builder)
         {
+            //Validations
+            builder
+                .Property(x => x.Quantity)
+                .IsRequired();
+
+
+            //Realtions
             builder
                 .HasOne(sp => sp.Shop)
                 .WithMany(s => s.ShopProducts)

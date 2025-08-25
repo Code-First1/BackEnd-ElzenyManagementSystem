@@ -28,7 +28,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
             services.AddInfrastructureServices(configuration);
             services.AddIdentityService();
 
-            services.AddApplicatinServices(configuration);
+            services.AddApplicationServices(configuration);
 
             services.ConfigureJwtServices(configuration);
 

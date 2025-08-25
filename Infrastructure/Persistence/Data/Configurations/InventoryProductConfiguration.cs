@@ -13,10 +13,20 @@ namespace Persistence.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<InventoryProduct> builder)
         {
+            //Validations
+            builder
+                .Property(x => x.Quantity)
+                .IsRequired();
+
+            builder.Property(x => x.MinimumQuantity)
+                .HasDefaultValue(0);
+
+            //Realations
             builder
                 .HasOne(ip => ip.Product)
                 .WithMany(p => p.InventoryProducts)
-                .HasForeignKey(ip => ip.ProductId);
+                .HasForeignKey(ip => ip.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
