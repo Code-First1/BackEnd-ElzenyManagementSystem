@@ -90,7 +90,7 @@ namespace Services
 
             if (existing is null) return false;
 
-            mapper.Map(dto, existing); // تحديث الخصائص باستخدام AutoMapper
+            mapper.Map(dto, existing);
             repo.Update(existing);
             await unitOfWork.SaveChangesAsync();
 
