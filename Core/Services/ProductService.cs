@@ -4,7 +4,9 @@ using Domain.Exceptions.product;
 using Domain.Models;
 using Services.Abstractions;
 using Services.Specifications;
+using Services.Specifications.InventoryProducts;
 using Services.Specifications.Products;
+using Services.Specifications.ShopProducts;
 using Shared.DTOs.Product;
 using Shared.Response;
 using Shared.SpecificationsParam.Product;
@@ -28,7 +30,12 @@ namespace Services
             var count = await unitOfWork.GetRepository<Product,int>().CountAsync(specCount);
 
             var result = mapper.Map<IEnumerable<ProductResultDto>>(products);
-            return new PaginationResponse<ProductResultDto>(productSpecsParams.PageIndex,productSpecsParams.PageSize,totalCount:count,result);
+
+            return new PaginationResponse<ProductResultDto>(
+                productSpecsParams.PageIndex,
+                productSpecsParams.PageSize,
+                totalCount:count,
+                result);
         }
 
         public async Task<ProductResultDto?> GetProductByIdAsync(int id)
@@ -44,7 +51,33 @@ namespace Services
         {
             var product = mapper.Map<Product>(dto);
 
+            // إضافة المنتج
             await unitOfWork.GetRepository<Product, int>().AddAsync(product);
+            await unitOfWork.SaveChangesAsync(); // نحتاج حفظ أول مرة عشان ناخد product.Id
+
+            // إنشاء InventoryProduct للمنتج الجديد
+            var inventoryProduct = new InventoryProduct
+            {
+                ProductId = product.Id,
+                Quantity = 0,
+                MinimumQuantity = 0
+            };
+
+            await unitOfWork.GetRepository<InventoryProduct, int>().AddAsync(inventoryProduct);
+
+            // إنشاء ShopProduct للمنتج الجديد (بـ default values)
+            var shopProduct = new ShopProduct
+            {
+                ProductId = product.Id,
+                Quantity = 0,
+                OpenedRollRemaining = 0,
+                SmallBoxesPerBigBox = 0,
+                FullBigBoxesCount = 0,
+                OpenedBigBoxRemaining = 0,
+                ShopId = 1 // ⚠️ لو عندك multiple shops، لازم تمرر shopId من مكان تاني
+            };
+            await unitOfWork.GetRepository<ShopProduct, int>().AddAsync(shopProduct);
+
             await unitOfWork.SaveChangesAsync();
 
             return product.Id;
@@ -57,7 +90,7 @@ namespace Services
 
             if (existing is null) return false;
 
-            mapper.Map(dto, existing); // تحديث الخصائص باستخدام AutoMapper
+            mapper.Map(dto, existing);
             repo.Update(existing);
             await unitOfWork.SaveChangesAsync();
 
@@ -66,15 +99,39 @@ namespace Services
 
         public async Task<bool> DeleteProductAsync(int id)
         {
-            var repo = unitOfWork.GetRepository<Product, int>();
-            var product = await repo.GetAsync(id);
+            var productRepo = unitOfWork.GetRepository<Product, int>();
+            var inventoryProductRepo = unitOfWork.GetRepository<InventoryProduct, int>();
+            var shopProductRepo = unitOfWork.GetRepository<ShopProduct, int>();
+
+            var product = await productRepo.GetAsync(id);
 
             if (product is null) return false;
 
-            repo.Delete(product);
+            // Get related InventoryProduct (if exists)
+            var inventoryProductSpec = new InventoryProductDeleteSpecification(id);
+
+            var inventoryProduct = await inventoryProductRepo.GetAsync(inventoryProductSpec);
+            if (inventoryProduct != null)
+            {
+                inventoryProductRepo.Delete(inventoryProduct);
+            }
+
+            var shopProductSpec = new ShopProductDeleteSpecification(id);
+            // Get related ShopProduct (if exists)
+            var shopProduct = await shopProductRepo.GetAsync(shopProductSpec);
+            if (shopProduct != null)
+            {
+                shopProductRepo.Delete(shopProduct);
+            }
+
+            // Delete Product itself
+            productRepo.Delete(product);
+
             await unitOfWork.SaveChangesAsync();
 
             return true;
         }
+
+
     }
 }

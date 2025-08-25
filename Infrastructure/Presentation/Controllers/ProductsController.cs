@@ -30,6 +30,7 @@ namespace Presentation.Controllers
         [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
         public async Task<ActionResult<PaginationResponse<ProductResultDto>>> GetAll([FromQuery]ProductSpecificationsParamters productSpecsParams)
         {
+            
             var result = await serviceManager.ProductService.GetProductsAsync(productSpecsParams);
             return Ok(result);
         }

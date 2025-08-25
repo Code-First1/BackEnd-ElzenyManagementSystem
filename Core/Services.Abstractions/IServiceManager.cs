@@ -9,8 +9,13 @@ namespace Services.Abstractions
     public interface IServiceManager
     {
         ICategoryService CategoryService { get; }
+        IInvoiceService InvoiceService { get; }
+
         ISubCategoryService SubCategoryService { get; }
         IProductService ProductService { get; }
+
+        IInventoryProductService InventoryProductService { get; }
+        IShopProductService ShopProductService { get; }
         IAuthService AuthService { get; }
     }
 }

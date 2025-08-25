@@ -8,9 +8,15 @@ namespace Domain.Models
 {
     public class InventoryProduct : BaseEntity<int>
     {
-        public int ProductId { get; set; }
-        public Product Product { get; set; }
         public int Quantity { get; set; }
-        public int MinimumQuantity { get; set; }
+        public int MinimumQuantity { get; set; } = 0;
+
+        //Forign Keys
+        public int ProductId { get; set; }
+
+        //Navigations
+        public Product Product { get; set; }
+
+
     }
 }
