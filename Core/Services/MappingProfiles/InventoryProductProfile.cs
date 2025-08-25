@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Models;
 using Shared.DTOs.InventoryProduct;
-using Shared.DTOs.Transactions;
 
 namespace Services.MappingProfiles
 {
