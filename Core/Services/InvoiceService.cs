@@ -83,37 +83,33 @@ namespace Services
             await unitOfWork.SaveChangesAsync();
             return invoice.Id;
         }
-
-
-
         public async Task<InvoiceResultDto?> UpdateInvoiceAsync(int id, InvoiceUpdateDto dto)
         {
             var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
 
-       
-            var invoice = await invoiceRepo.GetAsync(id);
+            var spec = new InvoiceWithProductsSpecification(id);
+            var invoice = await invoiceRepo.GetAsync(spec);
+
             if (invoice == null)
                 return null;
 
            
-            if (dto.ShopId.HasValue)
-                invoice.ShopId = dto.ShopId.Value;
-
-            if (!string.IsNullOrEmpty(dto.UserId))
-                invoice.UserId = dto.UserId;
+            if (dto.TotalPrice.HasValue)
+                invoice.TotalPrice = dto.TotalPrice.Value;
+            else
+              
+                invoice.TotalPrice = invoice.InvoiceProducts?.Sum(p => p.Quantity * p.UnitPrice) ?? 0;
 
            
-            if (invoice.InvoiceProducts != null)
-                invoice.TotalPrice = invoice.InvoiceProducts.Sum(p => p.Quantity * p.UnitPrice);
-
-
-            invoiceRepo.Update(invoice);
+                await unitOfWork.SaveChangesAsync();
+        
             
-            await unitOfWork.SaveChangesAsync();
 
-            
+
             return mapper.Map<InvoiceResultDto>(invoice);
         }
+
+
 
 
         public async Task<bool> DeleteInvoiceAsync(int id)

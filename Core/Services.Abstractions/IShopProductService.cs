@@ -14,5 +14,6 @@ namespace Services.Abstractions
         Task<PaginationResponse<ShopProductResultDto>> GetAllAsync(ShopProductSpecificationsParams specParams);
         Task<ShopProductResultDto?> GetByIdAsync(int id);
         Task<bool> UpdateAsync(int id, ShopProductUpdateDto dto);
+        Task<ShopProductCreateDto> CreateAsync(ShopProductCreateDto dto);
     }
 }

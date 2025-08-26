@@ -33,7 +33,7 @@ namespace Services.Specifications.Invoices
             //AddInclude(i => i.User);
             //AddInclude(i => i.Shop);
             AddInclude(i => i.InvoiceProducts);
-            AddInclude("InvoiceProduct.Product");
+            //AddInclude(i=>i.InvoiceProducts.Products);
 
         }
 

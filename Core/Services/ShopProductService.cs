@@ -17,6 +17,59 @@ namespace Services
 {
     public class ShopProductService(IUnitOfWork unitOfWork, IMapper mapper) : IShopProductService
     {
+        public async Task<ShopProductCreateDto> CreateAsync(ShopProductCreateDto dto)
+        {
+            var productRepo = unitOfWork.GetRepository<Product, int>();
+            var inventoryRepo = unitOfWork.GetRepository<InventoryProduct, int>();
+            var shopRepo = unitOfWork.GetRepository<Shop, int>();
+            var shopProductRepo = unitOfWork.GetRepository<ShopProduct, int>();
+
+        
+            var products = await shopProductRepo.GetAllAsync();
+            var product = products.FirstOrDefault(i => i.ProductId == dto.ProductId && i.ShopId == dto.ShopId);
+
+        
+            var productInventory = await inventoryRepo.GetAsync(dto.ProductId);
+            if (productInventory == null)
+                throw new Exception($"Product with Id {dto.ProductId} not found in Inventory");
+
+            if (dto.Quantity > productInventory.Quantity)
+                throw new Exception($"Not enough stock for product {dto.ProductId} in Inventory");
+
+            if (product != null)
+            {
+                
+                product.Quantity += dto.Quantity;
+                shopProductRepo.Update(product);
+            }
+            else
+            {
+              
+                var shopProduct = new ShopProduct
+                {
+                    ProductId = dto.ProductId,
+                    ShopId = dto.ShopId,
+                    Quantity = dto.Quantity,
+                    SmallBoxesPerBigBox = dto.SmallBoxesPerBigBox,
+                    FullBigBoxesCount = dto.FullBigBoxesCount,
+                    OpenedBigBoxRemaining = dto.OpenedBigBoxRemaining,
+                    OpenedRollRemaining = dto.OpenedRollRemaining
+                };
+
+                await shopProductRepo.AddAsync(shopProduct);
+            }
+
+           
+            productInventory.Quantity -= dto.Quantity;
+            inventoryRepo.Update(productInventory);
+
+            
+            await unitOfWork.SaveChangesAsync();
+
+            return dto;
+        }
+
+
         public async Task<PaginationResponse<ShopProductResultDto>> GetAllAsync(ShopProductSpecificationsParams specParams)
         {
             var spec = new ShopProductWithDetailsSpecification(specParams);
@@ -57,6 +110,8 @@ namespace Services
             await unitOfWork.SaveChangesAsync();
             return true;
         }
+
+
 
     }
 }

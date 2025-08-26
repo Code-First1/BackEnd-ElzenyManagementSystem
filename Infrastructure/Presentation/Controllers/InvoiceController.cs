@@ -87,7 +87,11 @@ namespace Presentation.Controllers
                 });
 
 
-            return Ok(updatedInvoice);
+            return CreatedAtAction(
+       nameof(GetById),                   
+       new { id = updatedInvoice.Id },    
+       updatedInvoice                     
+   );
         }
 
 

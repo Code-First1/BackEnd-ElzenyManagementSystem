@@ -50,6 +50,13 @@ namespace Presentation.Controllers
             var success = await serviceManager.ShopProductService.UpdateAsync(id, dto);
             return success ? NoContent() : NotFound();
         }
-
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] ShopProductCreateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var createdDto = await serviceManager.ShopProductService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = createdDto.ProductId }, createdDto);
+        }
     }
 }
