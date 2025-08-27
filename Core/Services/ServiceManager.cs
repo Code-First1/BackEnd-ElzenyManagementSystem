@@ -30,6 +30,7 @@ namespace Services
 
         public IInvoiceService InvoiceService { get; }= new InvoiceService(unitOfWork, mapper);
         public IInventoryToShopTransactionService InventoryToShopTransactionService { get; } = new InventoryToShopTransactionService(unitOfWork, mapper);
+        public IInventoryDashboardService InventoryDashboardService { get;} = new InventoryDashboardService(unitOfWork, mapper);
         public IAuthService AuthService { get; } = new AuthService(userManager, options, roleManager);
 
     }
