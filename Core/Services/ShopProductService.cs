@@ -22,8 +22,8 @@ namespace Services
             var spec = new ShopProductWithDetailsSpecification(specParams);
             var products = await unitOfWork.GetRepository<ShopProduct, int>().GetAllAsync(spec);
 
-            //var specCount = new ShopProductsWithCountSpecification(specParams);
-            var count = await unitOfWork.GetRepository<ShopProduct, int>().CountAsync(spec);
+            var specCount = new ShopProductsWithCountSpecification(specParams);
+            var count = await unitOfWork.GetRepository<ShopProduct, int>().CountAsync(specCount);
 
             var result = mapper.Map<IEnumerable<ShopProductResultDto>>(products);
 
