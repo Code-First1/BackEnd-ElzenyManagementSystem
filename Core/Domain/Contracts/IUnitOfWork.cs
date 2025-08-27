@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace Domain.Contracts
 
         // Generate Any Repository
         IGenericRepository<TEntity,Tkey> GetRepository<TEntity,Tkey>() where TEntity : BaseEntity<Tkey>;
+        Task<IDbContextTransaction> BeginTransactionAsync();
     }
 }

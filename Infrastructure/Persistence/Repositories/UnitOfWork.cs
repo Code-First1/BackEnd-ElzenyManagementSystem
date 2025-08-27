@@ -1,5 +1,6 @@
 ﻿using Domain.Contracts;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore.Storage;
 using Persistence.Data;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,10 @@ namespace Persistence.Repositories
             }
             return (IGenericRepository<TEntity,Tkey>) _repositories[type];
 
+        }
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
         }
 
         public async Task<int> SaveChangesAsync()
