@@ -8,6 +8,7 @@ namespace Shared.DTOs.InventoryDashboard
 {
     public class InventoryDashboardCountDto
     {
+        public int TotalProductsCount { get; set; }
         public int GoodProductsCount { get; set; }
         public int CriticalProductsCount { get; set; }
         public int EmptyProductsCount { get; set; }
