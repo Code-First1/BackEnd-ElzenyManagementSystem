@@ -22,12 +22,14 @@ namespace Services
         {
             var repo = _unitOfWork.GetRepository<InventoryProduct, int>();
 
+            var allCount = await repo.CountAsync(new AllProductsSpecifications());
             var goodCount = await repo.CountAsync(new GoodProductsSpecification());
             var criticalCount = await repo.CountAsync(new CriticalProductsSpecification());
             var emptyCount = await repo.CountAsync(new EmptyProductsSpecification());
 
             return new InventoryDashboardCountDto
             {
+                TotalProductsCount = allCount,
                 GoodProductsCount = goodCount,
                 CriticalProductsCount = criticalCount,
                 EmptyProductsCount = emptyCount
