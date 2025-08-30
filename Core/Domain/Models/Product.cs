@@ -16,11 +16,17 @@ namespace Domain.Models
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Unit is required.")]
-        public Unit Unit { get; set; }
+        public Unit UnitForWholeSale { get; set; }
+
+        public Unit UnitForRetail { get; set; }
 
         [Required(ErrorMessage = "Price per unit is required.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price per unit must be greater than 0.")]
-        public decimal PricePerUnit { get; set; }
+        public decimal PrieceForWholeSale { get; set; }
+
+        [Required(ErrorMessage = "Price per unit is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price per unit must be greater than 0.")]
+        public decimal PriceForRetail { get; set; }
 
         public string? PictureUrl { get; set; }
 

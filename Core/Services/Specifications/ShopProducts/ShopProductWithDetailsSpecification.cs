@@ -50,10 +50,10 @@ namespace Services.Specifications.ShopProducts
                         AddOrderBy(x => x.Quantity);
                         break;
                     case "pricedesc":
-                        AddOrderByDescending(x => x.Product.PricePerUnit);
+                        AddOrderByDescending(x => x.Product.PriceForRetail);
                         break;
                     case "priceasc":
-                        AddOrderBy(x => x.Product.PricePerUnit);
+                        AddOrderBy(x => x.Product.PriceForRetail);
                         break;
                     case "namedesc":
                         AddOrderByDescending(x => x.Product.Name);

@@ -45,10 +45,10 @@ namespace Services.Specifications.Products
                         AddOrderByDescending(P => P.Name);
                         break;
                     case "priceasc":
-                        AddOrderBy(P => P.PricePerUnit);
+                        AddOrderBy(P => P.PriceForRetail);
                         break;
                     case "pricedesc":
-                        AddOrderByDescending(P => P.PricePerUnit);
+                        AddOrderByDescending(P => P.PriceForRetail);
                         break;
                     default:
                         AddOrderBy(P => P.Name);

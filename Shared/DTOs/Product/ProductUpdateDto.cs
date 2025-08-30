@@ -15,12 +15,19 @@ namespace Shared.DTOs.Product
         public string Name { get; set; }
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "Unit is required.")]
-        public string Unit { get; set; }
+        [Required(ErrorMessage = "WholeSale Unit is required.")]
+        public string UnitForWholeSale { get; set; }
+
+        [Required(ErrorMessage = "Retail Unit is required.")]
+        public string UnitForRetail { get; set; }
 
         [Required(ErrorMessage = "Price per unit is required.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price per unit must be greater than 0.")]
-        public decimal PricePerUnit { get; set; }
+        public decimal PrieceForWholeSale { get; set; }
+
+        [Required(ErrorMessage = "Price per unit is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price per unit must be greater than 0.")]
+        public decimal PriceForRetail { get; set; }
         public string? PictureUrl { get; set; }
 
         public int CategoryId { get; set; }

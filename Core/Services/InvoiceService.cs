@@ -72,7 +72,7 @@ namespace Services
                 {
                     ProductId = product.Id,
                     Quantity = itemDto.Quantity,
-                    UnitPrice = product.PricePerUnit
+                    UnitPrice = product.PriceForRetail
                 };
 
                 invoice.InvoiceProducts.Add(invoiceItem);
@@ -165,10 +165,10 @@ namespace Services
                 {
                     item.ProductName = product.Name;
                     item.ProductId = product.Id;
-                    item.Unit = product.Unit.ToString();
-                    item.pricePerUnit = product.PricePerUnit;
+                    item.Unit = product.UnitForRetail.ToString();
+                    item.pricePerUnit = product.PriceForRetail;
 
-                    var temp = product.PricePerUnit * item.Quantity;
+                    var temp = product.PriceForRetail * item.Quantity;
                     total += temp;
                 }
             }
@@ -209,9 +209,9 @@ namespace Services
                     {
                         item.ProductName = product.Name;
                         item.ProductId = product.Id;
-                        item.Unit =product.Unit.ToString();
-                        item.pricePerUnit = product.PricePerUnit;
-                        var temp = product.PricePerUnit * item.Quantity; 
+                        item.Unit =product.UnitForRetail.ToString();
+                        item.pricePerUnit = product.PriceForRetail;
+                        var temp = product.PriceForRetail * item.Quantity; 
 
                         total += temp; 
                     }

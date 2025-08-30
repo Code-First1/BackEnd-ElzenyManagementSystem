@@ -16,16 +16,19 @@ namespace Services.MappingProfiles
         public ProductProfile()
         {
             CreateMap<Product, ProductResultDto>()
-            .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Unit.ToString()))
+            .ForMember(dest => dest.UnitForWholeSale, opt => opt.MapFrom(src => src.UnitForWholeSale.ToString()))
+            .ForMember(dest => dest.UnitForRetail, opt => opt.MapFrom(src => src.UnitForRetail.ToString()))
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
             .ForMember(dest => dest.SubCategoryName, opt => opt.MapFrom(src => src.SubCategory != null ? src.SubCategory.Name : null))
             .ForMember(d => d.PictureUrl , o => o.MapFrom<PictureUrlResolver>());
 
             CreateMap<ProductCreateDto, Product>()
-            .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => Enum.Parse<Unit>(src.Unit, true)));
+            .ForMember(dest => dest.UnitForWholeSale, opt => opt.MapFrom(src => Enum.Parse<Unit>(src.UnitForWholeSale, true)))
+            .ForMember(dest => dest.UnitForRetail, opt => opt.MapFrom(src => Enum.Parse<Unit>(src.UnitForRetail, true)));
 
             CreateMap<ProductUpdateDto, Product>()
-            .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => Enum.Parse<Unit>(src.Unit, true)));
+            .ForMember(dest => dest.UnitForWholeSale, opt => opt.MapFrom(src => Enum.Parse<Unit>(src.UnitForWholeSale, true)))
+            .ForMember(dest => dest.UnitForRetail, opt => opt.MapFrom(src => Enum.Parse<Unit>(src.UnitForRetail, true)));
 
         }
     }

@@ -19,7 +19,11 @@ namespace Persistence.Data.Configurations
                 .HasMaxLength(200);
 
             builder
-                .Property(p => p.PricePerUnit)
+                .Property(p => p.PrieceForWholeSale)
+                .HasPrecision(18, 2);
+
+            builder
+                .Property(p => p.PriceForRetail)
                 .HasPrecision(18, 2);
 
             //Realations
