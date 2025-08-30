@@ -47,13 +47,15 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ProductCreateDto dto)
+        [ProducesResponseType<AddProductDto>(StatusCodes.Status200OK, Type = typeof(AddProductDto))]
+
+        public async Task<ActionResult<AddProductDto>> Create([FromBody] ProductCreateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var newId = await serviceManager.ProductService.AddProductAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = newId }, new { id = newId });
+            var result = await serviceManager.ProductService.AddProductAsync(dto);
+            return result is null ? NotFound() : Ok(result); 
         }
 
         [HttpPut("{id:int}")]

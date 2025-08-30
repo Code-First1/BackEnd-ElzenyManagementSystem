@@ -12,7 +12,7 @@ public class InvoiceProfile : Profile
         CreateMap<InvoiceProduct, InvoiceProductResultDto>()
             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
             .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
-            .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Product.Unit))
+            .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Product.UnitForRetail))
             .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
     }
 }

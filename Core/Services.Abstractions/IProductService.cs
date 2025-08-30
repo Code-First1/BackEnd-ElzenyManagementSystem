@@ -18,7 +18,7 @@ namespace Services.Abstractions
         //GetById
         Task<ProductResultDto?> GetProductByIdAsync(int id);
 
-        Task<int> AddProductAsync(ProductCreateDto dto); 
+        Task<AddProductDto> AddProductAsync(ProductCreateDto dto); 
 
         Task<bool> UpdateProductAsync(int id, ProductUpdateDto dto);
 

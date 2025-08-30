@@ -47,7 +47,7 @@ namespace Services
             return product is null ? null : mapper.Map<ProductResultDto>(product);
         }
 
-        public async Task<int> AddProductAsync(ProductCreateDto dto)
+        public async Task<AddProductDto> AddProductAsync(ProductCreateDto dto)
         {
             var product = mapper.Map<Product>(dto);
 
@@ -65,7 +65,6 @@ namespace Services
 
             await unitOfWork.GetRepository<InventoryProduct, int>().AddAsync(inventoryProduct);
 
-            // إنشاء ShopProduct للمنتج الجديد (بـ default values)
             var shopProduct = new ShopProduct
             {
                 ProductId = product.Id,
@@ -74,13 +73,19 @@ namespace Services
                 SmallBoxesPerBigBox = 0,
                 FullBigBoxesCount = 0,
                 OpenedBigBoxRemaining = 0,
-                ShopId = 1 // ⚠️ لو عندك multiple shops، لازم تمرر shopId من مكان تاني
+                ShopId = 1 
             };
             await unitOfWork.GetRepository<ShopProduct, int>().AddAsync(shopProduct);
 
             await unitOfWork.SaveChangesAsync();
 
-            return product.Id;
+            var AddProduct = new AddProductDto
+            {
+                productId = product.Id,
+                inventoryProductId = inventoryProduct.Id
+            };
+
+            return AddProduct;
         }
 
         public async Task<bool> UpdateProductAsync(int id, ProductUpdateDto dto)
