@@ -14,8 +14,8 @@ namespace Shared.DTOs.Invoice
             [Required]
             public int ShopId { get; set; }
 
-            [Required]
-            public string UserId { get; set; }
+            //[Required]
+            //public string UserId { get; set; }
 
          
             //public decimal TotalPrice { get; set; }

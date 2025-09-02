@@ -11,6 +11,7 @@ using Shared.SpecificationsParam.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,14 +45,22 @@ namespace Presentation.Controllers
                 : Ok(result);
         }
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] InvoiceCreateDto dto)
+        public async Task<IActionResult> Create(string userid, [FromBody] InvoiceCreateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var newId = await serviceManager.InvoiceService.AddInvoiceAsync(dto);
+           
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized("User not authenticated");
+
+            var userId = int.Parse(userIdClaim.Value);
+
+            var newId = await serviceManager.InvoiceService.AddInvoiceAsync(userid, dto);
             return CreatedAtAction(nameof(GetById), new { id = newId }, new { id = newId });
         }
+
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]

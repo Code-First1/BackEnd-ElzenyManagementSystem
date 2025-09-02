@@ -13,13 +13,13 @@ namespace Services
 {
     public class InvoiceService(IUnitOfWork unitOfWork, IMapper mapper) : IInvoiceService
     {
-
-        public async Task<int> AddInvoiceAsync([FromBody] InvoiceCreateDto dto)
+        
+        public async Task<int> AddInvoiceAsync([FromQuery]string userid,[FromBody] InvoiceCreateDto dto)
         {
             var invoice = new Invoice
             {
                 ShopId = dto.ShopId,
-                UserId = dto.UserId,
+                UserId = userid,
                 CreateAt = DateTime.UtcNow,
                 InvoiceProducts = new List<InvoiceProduct>()
             };
