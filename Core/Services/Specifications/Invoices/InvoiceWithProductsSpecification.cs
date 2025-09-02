@@ -17,7 +17,7 @@ namespace Services.Specifications.Invoices
                     (!invoiceParams.ShopId.HasValue || i.ShopId == invoiceParams.ShopId) &&
                     (!invoiceParams.CreateAt.HasValue || i.CreateAt.Date == invoiceParams.CreateAt.Value.Date) &&
                     (string.IsNullOrEmpty(invoiceParams.Search) ||
-                        i.User.UserName.ToLower().Contains(invoiceParams.Search.ToLower()) ||
+                      
                         i.Shop.Name.ToLower().Contains(invoiceParams.Search.ToLower()))
             )
         {

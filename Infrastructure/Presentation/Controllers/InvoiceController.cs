@@ -11,6 +11,7 @@ using Shared.SpecificationsParam.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,14 +45,21 @@ namespace Presentation.Controllers
                 : Ok(result);
         }
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] InvoiceCreateDto dto)
         {
+            var username = User.FindFirst("user_name")?.Value;
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var newId = await serviceManager.InvoiceService.AddInvoiceAsync(dto);
+            var newId = await serviceManager.InvoiceService.AddInvoiceAsync(username,dto);
+
             return CreatedAtAction(nameof(GetById), new { id = newId }, new { id = newId });
         }
+
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]

@@ -14,12 +14,12 @@ namespace Services
     public class InvoiceService(IUnitOfWork unitOfWork, IMapper mapper) : IInvoiceService
     {
 
-        public async Task<int> AddInvoiceAsync([FromBody] InvoiceCreateDto dto)
+        public async Task<int> AddInvoiceAsync(string userName, [FromBody] InvoiceCreateDto dto)
         {
             var invoice = new Invoice
             {
                 ShopId = dto.ShopId,
-                UserId = dto.UserId,
+                UserName= userName,
                 CreateAt = DateTime.UtcNow,
                 InvoiceProducts = new List<InvoiceProduct>()
             };
@@ -31,24 +31,31 @@ namespace Services
 
             var allInventory = await inventoryRepo.GetAllAsync();
             var allShop = await shopRepo.GetAllAsync();
-
+            decimal Sum = 0;
+            
             foreach (var itemDto in dto.Items)
             {
+                InvoiceProduct invoiceItem = null!;
 
                 var product = await productRepo.GetAsync(itemDto.ProductId);
                 if (product == null)
                     throw new Exception($"Product with Id {itemDto.ProductId} not found");
-                if (itemDto.Unit == Unit.Roll)
+                if (itemDto.Unit == Unit.Roll || itemDto.Unit==Unit.box)
                 {
                     var inventoryProduct = allInventory.FirstOrDefault(x => x.ProductId == product.Id);
                     if (inventoryProduct == null)
                         throw new Exception($"Inventory record not found for Product {product.Id}");
-
-
                     if (inventoryProduct.Quantity < itemDto.Quantity)
                         throw new Exception($"Not enough stock for product {product.Id}");
                     inventoryProduct.Quantity -= itemDto.Quantity;
+                    Sum += itemDto.Quantity * product.PrieceForWholeSale;
                     inventoryRepo.Update(inventoryProduct);
+                    invoiceItem = new InvoiceProduct
+                    {
+                        ProductId = product.Id,
+                        Quantity = itemDto.Quantity,
+                        UnitPrice = product.PrieceForWholeSale
+                    };
 
                 }
                 else if (itemDto.Unit == Unit.Piece || itemDto.Unit == Unit.Meter)
@@ -65,19 +72,21 @@ namespace Services
                         throw new Exception($"Not enough stock in Shop {dto.ShopId} for product {product.Id}");
 
                     shopProduct.Quantity -= itemDto.Quantity;
+                    Sum += itemDto.Quantity * product.PriceForRetail;
                     shopProductRepo.Update(shopProduct);
+                    invoiceItem = new InvoiceProduct
+                    {
+                        ProductId = product.Id,
+                        Quantity = itemDto.Quantity,
+                        UnitPrice = product.PriceForRetail
+                    };
 
                 }
-                var invoiceItem = new InvoiceProduct
-                {
-                    ProductId = product.Id,
-                    Quantity = itemDto.Quantity,
-                    UnitPrice = product.PriceForRetail
-                };
+               
 
                 invoice.InvoiceProducts.Add(invoiceItem);
             }
-            invoice.TotalPrice = invoice.InvoiceProducts.Sum(i => i.UnitPrice * i.Quantity);
+            invoice.TotalPrice = Sum;
             var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
             await invoiceRepo.AddAsync(invoice);
             await unitOfWork.SaveChangesAsync();
@@ -99,8 +108,8 @@ namespace Services
             if (dto.ShopId.HasValue)
                 invoice.ShopId = dto.ShopId.Value;
 
-            if (!string.IsNullOrEmpty(dto.UserId))
-                invoice.UserId = dto.UserId;
+            if (!string.IsNullOrEmpty(dto.UserName))
+                invoice.UserName = dto.UserName;
 
            
             if (invoice.InvoiceProducts != null)

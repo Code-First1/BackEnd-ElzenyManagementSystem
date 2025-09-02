@@ -16,14 +16,14 @@ namespace Domain.Models
 
         //Forign Keys
         public int ShopId { get; set; }
-        public string UserId { get; set; }
+        public string UserName { get; set; }
 
 
         // Navigation Property 
         public List<InvoiceProduct> InvoiceProducts { get; set; }
         //public List<Product> Products { get; set; }
         public Shop Shop { get; set; }
-        public AppUser User { get; set; }
+       
 
 
     }
