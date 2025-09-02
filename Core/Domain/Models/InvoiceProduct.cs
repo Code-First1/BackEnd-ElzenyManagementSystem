@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models
 {
@@ -13,6 +14,7 @@ namespace Domain.Models
 
         public decimal Total => Quantity * UnitPrice;
 
+        public Unit Typing { get; set; }
         //Forign Keys
 
         [Required]

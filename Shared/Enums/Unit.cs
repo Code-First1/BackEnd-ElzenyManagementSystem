@@ -10,6 +10,7 @@ namespace Domain.Enums
     {
         Meter=0,
         Piece=1,
-        Roll=2
+        Roll=2,
+        box=3,
     }
 }
