@@ -13,7 +13,7 @@ namespace Domain.Models
         public int SmallBoxesPerBigBox { get; set; }
 
         public int FullBigBoxesCount { get; set; }
-
+        
         public int OpenedBigBoxRemaining { get; set; }
 
         //ForigenKesy

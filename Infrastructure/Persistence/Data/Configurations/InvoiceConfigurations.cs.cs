@@ -17,10 +17,7 @@ namespace Persistence.Data.Configurations
                 .WithMany(s => s.Invoices)
                 .HasForeignKey(i => i.ShopId);
 
-            builder
-                .HasOne(i => i.User)
-                .WithMany()
-                .HasForeignKey(i => i.UserId);
+
 
             
         }
