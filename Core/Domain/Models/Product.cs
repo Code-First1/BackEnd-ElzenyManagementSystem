@@ -30,6 +30,8 @@ namespace Domain.Models
 
         public string? PictureUrl { get; set; }
 
+        public int QuantityForOrigin { get; set; }
+
 
         //Forign Keys
         [Required(ErrorMessage = "Category is required.")]
