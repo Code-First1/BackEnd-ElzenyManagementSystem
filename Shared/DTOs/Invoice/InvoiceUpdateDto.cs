@@ -10,10 +10,10 @@ namespace Shared.DTOs.Invoice
     public class InvoiceUpdateDto
     {
       
-        public int? ShopId { get; set; }
+        //public int? ShopId { get; set; }
 
        
-        public string? UserName { get; set; }
+        //public string? UserName { get; set; }
 
 
         public decimal? TotalPrice { get; set; }
