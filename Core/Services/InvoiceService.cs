@@ -60,24 +60,24 @@ namespace Services
 
                     itemDto.Quantity -= availableInShop;
                     shopProduct.Quantity = 0;
-                    if(product.QuantityForOrigin<=0)
+                    if (product.QuantityForOrigin <= 0)
                     {
                         throw new Exception("Quantity must be greater than 0 in database");
                     }
 
-                    
+
                     int neededFromInventory = (int)Math.Ceiling((double)itemDto.Quantity / product.QuantityForOrigin);
 
                     if (inventoryProduct.Quantity < neededFromInventory)
                         throw new Exception($"Not enough stock in Inventory for product {product.Id}");
 
-              
+
                     inventoryProduct.Quantity -= neededFromInventory;
 
-                   
+
                     shopProduct.Quantity += neededFromInventory * product.QuantityForOrigin;
 
-                   
+
                     if (shopProduct.Quantity < itemDto.Quantity)
                         throw new Exception($"Still not enough stock in Shop after refill for product {product.Id}");
 
@@ -85,16 +85,17 @@ namespace Services
                 }
                 else
                 {
-                    
+
                     shopProduct.Quantity -= itemDto.Quantity;
                 }
 
-               
+
                 shopProductRepo.Update(shopProduct);
                 inventoryRepo.Update(inventoryProduct);
 
-              
+
                 decimal unitPrice = itemDto.Typing ? product.PrieceForWholeSale : product.PriceForRetail;
+
                 sum += itemDto.Quantity * unitPrice;
 
                 var invoiceItem = new InvoiceProduct
@@ -122,23 +123,23 @@ namespace Services
         {
             var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
 
-       
+
             var invoice = await invoiceRepo.GetAsync(id);
             if (invoice == null)
                 return null;
 
-           
-       
-           
+
+
+
             if (invoice.InvoiceProducts != null)
                 invoice.TotalPrice = invoice.InvoiceProducts.Sum(p => p.Quantity * p.UnitPrice);
 
 
             invoiceRepo.Update(invoice);
-            
+
             await unitOfWork.SaveChangesAsync();
 
-            
+
             return mapper.Map<InvoiceResultDto>(invoice);
         }
 
@@ -181,22 +182,30 @@ namespace Services
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var allProducts = await productRepo.GetAllAsync();
 
+            var invoiceProductRepo = unitOfWork.GetRepository<InvoiceProduct, int>();
+            var allInvoiceProducts = await invoiceProductRepo.GetAllAsync();
+
             var result = mapper.Map<InvoiceResultDto>(invoice);
 
             decimal total = 0;
 
             foreach (var item in result.InvoiceProduct)
             {
+                
                 var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
                 if (product != null)
                 {
                     item.ProductName = product.Name;
-                    item.ProductId = product.Id;
-                 
-                    item.pricePerUnit = product.PriceForRetail;
+                }
 
-                    var temp = product.PriceForRetail * item.Quantity;
-                    total += temp;
+            
+                var invProd = allInvoiceProducts
+                    .FirstOrDefault(ip => ip.ProductId == item.ProductId && ip.InvoiceId == result.Id);
+
+                if (invProd != null)
+                {
+                    item.pricePerUnit = invProd.UnitPrice;
+                    total += invProd.UnitPrice * item.Quantity;
                 }
             }
 
@@ -209,6 +218,7 @@ namespace Services
 
         public async Task<PaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams)
         {
+       
             var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
             var invoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
 
@@ -220,32 +230,46 @@ namespace Services
                     new List<InvoiceResultDto>()
                 );
 
+           
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var allProducts = await productRepo.GetAllAsync();
 
+            
+            var invoiceProductRepo = unitOfWork.GetRepository<InvoiceProduct, int>();
+            var allInvoiceProducts = await invoiceProductRepo.GetAllAsync();
+
+          
             var result = mapper.Map<IEnumerable<InvoiceResultDto>>(invoices);
 
+        
             foreach (var invoiceDto in result)
             {
                 decimal total = 0;
 
                 foreach (var item in invoiceDto.InvoiceProduct)
                 {
+                
                     var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
                     if (product != null)
                     {
                         item.ProductName = product.Name;
-                        item.ProductId = product.Id;
-                        item.pricePerUnit = product.PriceForRetail;
-                        var temp = product.PriceForRetail * item.Quantity; 
+                    }
 
-                        total += temp; 
+               
+                    var invProd = allInvoiceProducts
+                        .FirstOrDefault(ip => ip.ProductId == item.ProductId && ip.InvoiceId == invoiceDto.Id);
+
+                    if (invProd != null)
+                    {
+                        item.pricePerUnit = invProd.UnitPrice;
+                        total += invProd.UnitPrice * item.Quantity;
                     }
                 }
 
                 invoiceDto.Total = total;
             }
 
+           
             var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
             var count = await unitOfWork.GetRepository<Invoice, int>().CountAsync(specCount);
 
