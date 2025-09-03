@@ -1,6 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Shared.DTOs.InventoryToShopTransation;
+using Shared.DTOs.Product;
+using Shared.DTOs.TransationFromInventoryToShopInProduct;
+using Shared.ErrorModels;
+using Shared.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,19 +20,17 @@ namespace Presentation.Controllers
     public class InventoryToShopTransactionsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> CreateTransaction([FromBody] InventoryToShopTransactionCreateDto dto)
+        [ProducesResponseType<TransactionPerProductResultDto>(StatusCodes.Status200OK, Type = typeof(TransactionPerProductResultDto))]
+        [ProducesResponseType<TransactionPerProductResultDto>(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
+        [ProducesResponseType<TransactionPerProductResultDto>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
+        public async Task<IActionResult> CreateTransaction([FromBody] TransactionPerProductCreateDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var transactionId = await serviceManager.InventoryToShopTransactionService.CreateTransactionAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = transactionId }, null);
+            var result = await serviceManager.TransactionPerProductService.CreateTransactionAsync(dto);
+            return Ok(result);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            // ممكن تعمل DTO للـ Transaction مع Items
-            return Ok($"Transaction {id} details here ...");
-        }
+        
     }
 }
