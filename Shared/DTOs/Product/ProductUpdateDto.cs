@@ -28,6 +28,8 @@ namespace Shared.DTOs.Product
         [Required(ErrorMessage = "Price per unit is required.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price per unit must be greater than 0.")]
         public decimal PriceForRetail { get; set; }
+        public int QuantityForOrigin { get; set; }
+
         public string? PictureUrl { get; set; }
 
         public int CategoryId { get; set; }
