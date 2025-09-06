@@ -9,10 +9,9 @@ namespace Services.Specifications.Invoices
             : base(
                 i =>
                     (!invoiceParams.ShopId.HasValue || i.ShopId == invoiceParams.ShopId) &&
-                    (!string.IsNullOrEmpty(i.UserName) || i.UserName == invoiceParams.UserName) &&
                     (!invoiceParams.CreateAt.HasValue || i.CreateAt.Date == invoiceParams.CreateAt.Value.Date) &&
+                    (string.IsNullOrEmpty(invoiceParams.DisplayName) || i.UserName.ToLower() == invoiceParams.DisplayName.ToLower()) &&
                     (string.IsNullOrEmpty(invoiceParams.Search) ||
-                       
                         i.Shop.Name.ToLower().Contains(invoiceParams.Search.ToLower()))
             )
         {
