@@ -25,7 +25,8 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
             app.UseRouting();
 
             app.UseCors("AllowAll");
-
+            app.UseAuthentication();
+            app.UseCheckUserExists();
             app.UseAuthorization();
 
 

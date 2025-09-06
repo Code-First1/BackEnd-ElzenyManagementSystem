@@ -12,6 +12,7 @@ namespace Domain.Enums
         Piece=1,
         Roll=2,
         box=3,
-           
+        SpongeRoll=4
+
     }
 }
