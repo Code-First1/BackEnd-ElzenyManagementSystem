@@ -212,5 +212,22 @@ namespace Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public async Task<bool> DeleteUserAsync(string username)
+        {
+            var user = await userManager.FindByNameAsync(username);
+            if (user == null)
+                throw new UserNotFoundException(username);
+
+            var result = await userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                throw new ValidationException(errors);
+            }
+
+            return true;
+        }
+
     }
 }

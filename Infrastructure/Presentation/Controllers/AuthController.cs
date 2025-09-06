@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Services;
 using Services.Abstractions;
 using Shared.DTOs.Auth;
 using Shared.DTOs.Product;
@@ -87,5 +88,19 @@ namespace Presentation.Controllers
             var users = await serviceManager.AuthService.GetAllUsersAsync();
             return Ok(users);
         }
+
+        [HttpDelete("{username}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]           
+        [ProducesResponseType(StatusCodes.Status404NotFound)]   
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteUser(string username)
+        {
+            var result = await serviceManager.AuthService.DeleteUserAsync(username);
+            if (!result)
+                return NotFound(new { message = "User not found" });
+
+            return Ok(new { message = "User deleted successfully" });
+        }
+
     }
 }

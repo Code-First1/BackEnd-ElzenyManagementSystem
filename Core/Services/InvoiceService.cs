@@ -33,6 +33,7 @@ namespace Services
             var shopProducts = await shopProductRepo.GetAllAsync();
 
             decimal sum = 0;
+            int transactionCount = 0;
 
             foreach (var itemDto in dto.Items)
             {
@@ -76,12 +77,13 @@ namespace Services
 
 
                     shopProduct.Quantity += neededFromInventory * product.QuantityForOrigin;
-
+                   
 
                     if (shopProduct.Quantity < itemDto.Quantity)
                         throw new Exception($"Still not enough stock in Shop after refill for product {product.Id}");
 
                     shopProduct.Quantity -= itemDto.Quantity;
+                    transactionCount = shopProduct.Quantity;
                 }
                 else
                 {
@@ -102,14 +104,15 @@ namespace Services
                 {
                     ProductId = product.Id,
                     Quantity = itemDto.Quantity,
-                    UnitPrice = unitPrice
+                    UnitPrice = unitPrice,
+                    TransferCount=transactionCount
                 };
 
                 invoice.InvoiceProducts.Add(invoiceItem);
             }
 
             invoice.TotalPrice = sum;
-
+            invoice.UserName = userName;
             var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
             await invoiceRepo.AddAsync(invoice);
             await unitOfWork.SaveChangesAsync();
