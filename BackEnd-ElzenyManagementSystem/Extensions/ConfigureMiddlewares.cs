@@ -18,7 +18,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
                 app.UseSwaggerUI();
             }
 
-        app.UseStaticFiles();
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
 
@@ -26,6 +26,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
 
             app.UseCors("AllowAll");
             app.UseAuthentication();
+            // defined middleware to reject any deleted user
             app.UseCheckUserExists();
             app.UseAuthorization();
 
