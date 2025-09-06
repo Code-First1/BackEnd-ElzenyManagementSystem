@@ -15,7 +15,7 @@ namespace Services
     public class InvoiceService(IUnitOfWork unitOfWork, IMapper mapper) : IInvoiceService
     {
 
-        public async Task<int> AddInvoiceAsync(string userName, [FromBody] InvoiceCreateDto dto)
+        public async Task<InvoiceCreateResultDto> AddInvoiceAsync(string userName, [FromBody] InvoiceCreateDto dto)
         {
             var invoice = new Invoice
             {
@@ -117,7 +117,11 @@ namespace Services
             await invoiceRepo.AddAsync(invoice);
             await unitOfWork.SaveChangesAsync();
 
-            return invoice.Id;
+            return new InvoiceCreateResultDto
+            {
+                Id = invoice.Id,
+                TransferCount = transactionCount
+            };
         }
 
 
