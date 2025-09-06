@@ -26,7 +26,7 @@ namespace Presentation.Controllers
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status200OK, Type = typeof(PaginationResponse<InvoiceResultDto>))]
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
-        public async Task<ActionResult<PaginationResponse<InvoiceResultDto>>> GetAll([FromQuery] InvoiceSpecificationsParamters invoiceSpecsParams)
+        public async Task<ActionResult<InvoicePaginationResponse<InvoiceResultDto>>> GetAll([FromQuery] InvoiceSpecificationsParamters invoiceSpecsParams)
         {
             var result = await serviceManager.InvoiceService.GetInvoicesAsync(invoiceSpecsParams);
             return Ok(result);

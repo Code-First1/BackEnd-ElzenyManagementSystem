@@ -15,7 +15,7 @@ namespace Services.Abstractions
     {
 
         //GetAllProduct
-        Task<PaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams);
+        Task<InvoicePaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams);
         //GetById
         Task<InvoiceResultDto?> GetInvoiceByIdAsync(int id);
 

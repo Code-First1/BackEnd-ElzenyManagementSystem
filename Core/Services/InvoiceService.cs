@@ -225,21 +225,24 @@ namespace Services
 
 
 
-        public async Task<PaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams)
+        public async Task<InvoicePaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams)
         {
        
             var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
             var invoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
 
             if (!invoices.Any())
-                return new PaginationResponse<InvoiceResultDto>(
-                    invoiceSpecsParams.PageIndex,
-                    invoiceSpecsParams.PageSize,
-                    0,
-                    new List<InvoiceResultDto>()
+            {
+                return new InvoicePaginationResponse<InvoiceResultDto>(
+                    pageIndex: invoiceSpecsParams.PageIndex,
+                    pageSize: invoiceSpecsParams.PageSize,
+                    totalCount: 0,
+                    data: new List<InvoiceResultDto>(),
+                    grandTotal: 0
                 );
+            }
 
-           
+
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var allProducts = await productRepo.GetAllAsync();
 
@@ -278,16 +281,20 @@ namespace Services
                 invoiceDto.Total = total;
             }
 
-           
+            var grandTotal = result.Sum(r => r.Total);
             var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
             var count = await unitOfWork.GetRepository<Invoice, int>().CountAsync(specCount);
+            return new InvoicePaginationResponse<InvoiceResultDto>(
+                  pageIndex: invoiceSpecsParams.PageIndex,
+                  pageSize: invoiceSpecsParams.PageSize,
+                  totalCount: count,
+                   grandTotal: grandTotal,
+                  data: result
+                 
+                  );
 
-            return new PaginationResponse<InvoiceResultDto>(
-                pageIndex: invoiceSpecsParams.PageIndex,
-                pageSize: invoiceSpecsParams.PageSize,
-                totalCount: count,
-                data: result
-            );
+
+
         }
     }
     }
