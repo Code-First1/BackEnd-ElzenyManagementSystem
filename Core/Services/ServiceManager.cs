@@ -34,5 +34,6 @@ namespace Services
         public IInventoryDashboardService InventoryDashboardService { get;} = new InventoryDashboardService(unitOfWork, mapper);
         public IAuthService AuthService { get; } = new AuthService(userManager, options, roleManager);
 
+        public IDashboardService DashboardService { get; } = new DashboardService(unitOfWork, mapper);
     }
 }

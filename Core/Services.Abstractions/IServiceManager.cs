@@ -21,5 +21,6 @@ namespace Services.Abstractions
         ITransactionPerProductService TransactionPerProductService { get; }
         IInventoryToShopTransactionService InventoryToShopTransactionService { get; }
         IAuthService AuthService { get; }
+        IDashboardService DashboardService { get; }
     }
 }
