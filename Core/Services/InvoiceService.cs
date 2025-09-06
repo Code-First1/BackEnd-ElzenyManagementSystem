@@ -230,7 +230,7 @@ namespace Services
        
             var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
             var invoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
-
+            decimal grandTotal = 0;
             if (!invoices.Any())
             {
                 return new InvoicePaginationResponse<InvoiceResultDto>(
@@ -257,7 +257,7 @@ namespace Services
             foreach (var invoiceDto in result)
             {
                 decimal total = 0;
-
+              
                 foreach (var item in invoiceDto.InvoiceProduct)
                 {
                 
@@ -271,6 +271,7 @@ namespace Services
                     var invProd = allInvoiceProducts
                         .FirstOrDefault(ip => ip.ProductId == item.ProductId && ip.InvoiceId == invoiceDto.Id);
 
+
                     if (invProd != null)
                     {
                         item.pricePerUnit = invProd.UnitPrice;
@@ -279,9 +280,10 @@ namespace Services
                 }
 
                 invoiceDto.Total = total;
+                grandTotal += total;
             }
 
-            var grandTotal = result.Sum(r => r.Total);
+           
             var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
             var count = await unitOfWork.GetRepository<Invoice, int>().CountAsync(specCount);
             return new InvoicePaginationResponse<InvoiceResultDto>(
