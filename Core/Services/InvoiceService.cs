@@ -2,6 +2,7 @@
 using Domain.Contracts;
 using Domain.Enums;
 using Domain.Models;
+using Domain.Models.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Services.Specifications.Invoices;
@@ -28,6 +29,7 @@ namespace Services
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var inventoryRepo = unitOfWork.GetRepository<InventoryProduct, int>();
             var shopProductRepo = unitOfWork.GetRepository<ShopProduct, int>();
+            
 
             var allInventory = await inventoryRepo.GetAllAsync();
             var shopProducts = await shopProductRepo.GetAllAsync();
