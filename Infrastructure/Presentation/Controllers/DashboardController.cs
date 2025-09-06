@@ -10,12 +10,12 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DashboardController(IDashboardService dashboardService):ControllerBase
+    public class DashboardController(IServiceManager serviceManager) :ControllerBase
     {
         [HttpGet("total-products")]
         public async Task<IActionResult> GetTotalProducts()
         {
-            var totalProducts = await dashboardService.GetTotalProductsAsync();
+            var totalProducts = await serviceManager.DashboardService.GetTotalProductsAsync();
             return Ok(totalProducts);
         }
         [HttpGet("revenue")]
@@ -25,13 +25,13 @@ namespace Presentation.Controllers
             {
                 return BadRequest("Days must be greater than zero.");
             }
-            var revenue = await dashboardService.GetRevenueAsync(days);
+            var revenue = await serviceManager.DashboardService.GetRevenueAsync(days);
             return Ok(revenue);
         }
         [HttpGet("low-stock-products")]
         public async Task<IActionResult> GetLowStockProducts()
         {
-            var lowStockProducts = await dashboardService.GetLowStockProductsAsync();
+            var lowStockProducts = await serviceManager.DashboardService.GetLowStockProductsAsync();
             return Ok(lowStockProducts);
         }
 

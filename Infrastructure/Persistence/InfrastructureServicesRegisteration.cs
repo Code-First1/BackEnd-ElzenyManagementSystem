@@ -28,6 +28,7 @@ namespace Persistence
             });
 
             services.AddScoped<IDbInitializer, DbInitializer>(); //Allow DI For DbInitalizer
+          
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
