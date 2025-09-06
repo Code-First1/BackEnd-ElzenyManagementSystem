@@ -271,6 +271,7 @@ namespace Services
                     var invProd = allInvoiceProducts
                         .FirstOrDefault(ip => ip.ProductId == item.ProductId && ip.InvoiceId == invoiceDto.Id);
 
+
                     if (invProd != null)
                     {
                         item.pricePerUnit = invProd.UnitPrice;
