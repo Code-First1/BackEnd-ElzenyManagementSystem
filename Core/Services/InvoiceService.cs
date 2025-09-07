@@ -227,34 +227,47 @@ namespace Services
 
         public async Task<InvoicePaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams)
         {
+            // Get paginated invoices for display
             var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
-            var allInvoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
+            var paginatedInvoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
 
-            decimal grandTotal = 0;
+            // Get all products and invoice products for calculations
+            var productRepo = unitOfWork.GetRepository<Product, int>();
+            var allProducts = await productRepo.GetAllAsync();
+            var invoiceProductRepo = unitOfWork.GetRepository<InvoiceProduct, int>();
+            var allInvoiceProducts = await invoiceProductRepo.GetAllAsync();
 
-            if (!allInvoices.Any())
+            // Calculate grand total for ALL invoices (without pagination)
+            var specForGrandTotal = new InvoiceWithProductsSpecification(new InvoiceSpecificationsParamters
+            {
+                // Copy filter parameters but remove pagination
+                Search = invoiceSpecsParams.Search,
+                // Add other filter properties if you have them (like date range, status, etc.)
+                PageIndex = 1,
+                PageSize = int.MaxValue
+            });
+
+            var allInvoicesForTotal = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(specForGrandTotal);
+            decimal totalGrandAmount = await CalculateGrandTotal(allInvoicesForTotal, allProducts, allInvoiceProducts);
+
+            if (!paginatedInvoices.Any())
             {
                 return new InvoicePaginationResponse<InvoiceResultDto>(
                     pageIndex: invoiceSpecsParams.PageIndex,
                     pageSize: invoiceSpecsParams.PageSize,
                     totalCount: 0,
                     data: new List<InvoiceResultDto>(),
-                    grandTotal: 0
+                    grandTotal: totalGrandAmount
                 );
             }
 
-            var productRepo = unitOfWork.GetRepository<Product, int>();
-            var allProducts = await productRepo.GetAllAsync();
+            // Map paginated results
+            var result = mapper.Map<IEnumerable<InvoiceResultDto>>(paginatedInvoices).ToList();
 
-            var invoiceProductRepo = unitOfWork.GetRepository<InvoiceProduct, int>();
-            var allInvoiceProducts = await invoiceProductRepo.GetAllAsync();
-
-            var result = mapper.Map<IEnumerable<InvoiceResultDto>>(allInvoices).ToList();
-
+            // Calculate totals for paginated results
             foreach (var invoiceDto in result)
             {
                 decimal total = 0;
-
                 foreach (var item in invoiceDto.InvoiceProduct)
                 {
                     var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
@@ -265,24 +278,16 @@ namespace Services
 
                     var invProd = allInvoiceProducts
                         .FirstOrDefault(ip => ip.ProductId == item.ProductId && ip.InvoiceId == invoiceDto.Id);
-
                     if (invProd != null)
                     {
                         item.pricePerUnit = invProd.UnitPrice;
                         total += invProd.UnitPrice * item.Quantity;
                     }
                 }
-
                 invoiceDto.Total = total;
-                grandTotal += total;
             }
 
-          
-            var pagedResult = result
-                .Skip((invoiceSpecsParams.PageIndex - 1) * invoiceSpecsParams.PageSize)
-                .Take(invoiceSpecsParams.PageSize)
-                .ToList();
-
+            // Get total count for pagination
             var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
             var count = await unitOfWork.GetRepository<Invoice, int>().CountAsync(specCount);
 
@@ -290,8 +295,127 @@ namespace Services
                 pageIndex: invoiceSpecsParams.PageIndex,
                 pageSize: invoiceSpecsParams.PageSize,
                 totalCount: count,
-                data: pagedResult,
-                grandTotal: grandTotal
+                data: result,
+                grandTotal: totalGrandAmount
+            );
+        }
+
+        // Helper method to calculate grand total
+        private async Task<decimal> CalculateGrandTotal(
+            IEnumerable<Invoice> invoices,
+            IEnumerable<Product> products = null,
+            IEnumerable<InvoiceProduct> invoiceProducts = null)
+        {
+            if (!invoices.Any())
+                return 0;
+
+            // Load products and invoice products if not provided
+            if (products == null)
+            {
+                var productRepo = unitOfWork.GetRepository<Product, int>();
+                products = await productRepo.GetAllAsync();
+            }
+
+            if (invoiceProducts == null)
+            {
+                var invoiceProductRepo = unitOfWork.GetRepository<InvoiceProduct, int>();
+                invoiceProducts = await invoiceProductRepo.GetAllAsync();
+            }
+
+            decimal grandTotal = 0;
+
+            foreach (var invoice in invoices)
+            {
+                decimal invoiceTotal = 0;
+                var invoiceProductsForThisInvoice = invoiceProducts.Where(ip => ip.InvoiceId == invoice.Id);
+
+                foreach (var invProd in invoiceProductsForThisInvoice)
+                {
+                    invoiceTotal += invProd.UnitPrice * invProd.Quantity;
+                }
+
+                grandTotal += invoiceTotal;
+            }
+
+            return grandTotal;
+        }
+
+        // Alternative: More efficient approach using LINQ
+        public async Task<InvoicePaginationResponse<InvoiceResultDto>> GetInvoicesAsyncOptimized(InvoiceSpecificationsParamters invoiceSpecsParams)
+        {
+            // Get paginated invoices
+            var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
+            var paginatedInvoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
+
+            // Get all products and invoice products
+            var productRepo = unitOfWork.GetRepository<Product, int>();
+            var allProducts = await productRepo.GetAllAsync();
+            var invoiceProductRepo = unitOfWork.GetRepository<InvoiceProduct, int>();
+            var allInvoiceProducts = await invoiceProductRepo.GetAllAsync();
+
+            // Get all invoice IDs that match the filter (without pagination)
+            var specForAllIds = new InvoiceWithProductsSpecification(new InvoiceSpecificationsParamters
+            {
+                Search = invoiceSpecsParams.Search,
+                // Copy other filter properties
+                PageIndex = 1,
+                PageSize = int.MaxValue
+            });
+
+            var allFilteredInvoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(specForAllIds);
+            var allFilteredInvoiceIds = allFilteredInvoices.Select(i => i.Id).ToHashSet();
+
+            // Calculate grand total using LINQ
+            decimal calculatedGrandTotal = allInvoiceProducts
+                .Where(ip => allFilteredInvoiceIds.Contains(ip.InvoiceId))
+                .Sum(ip => ip.UnitPrice * ip.Quantity);
+
+            if (!paginatedInvoices.Any())
+            {
+                return new InvoicePaginationResponse<InvoiceResultDto>(
+                    pageIndex: invoiceSpecsParams.PageIndex,
+                    pageSize: invoiceSpecsParams.PageSize,
+                    totalCount: 0,
+                    data: new List<InvoiceResultDto>(),
+                    grandTotal: calculatedGrandTotal
+                );
+            }
+
+            // Map and calculate totals for paginated results
+            var result = mapper.Map<IEnumerable<InvoiceResultDto>>(paginatedInvoices).ToList();
+
+            foreach (var invoiceDto in result)
+            {
+                decimal total = 0;
+                foreach (var item in invoiceDto.InvoiceProduct)
+                {
+                    var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
+                    if (product != null)
+                    {
+                        item.ProductName = product.Name;
+                    }
+
+                    var invProd = allInvoiceProducts
+                        .FirstOrDefault(ip => ip.ProductId == item.ProductId && ip.InvoiceId == invoiceDto.Id);
+                    if (invProd != null)
+                    {
+                        item.pricePerUnit = invProd.UnitPrice;
+                        total += invProd.UnitPrice * item.Quantity;
+                    }
+                }
+                invoiceDto.Total = total;
+            }
+
+            // Get total count
+            var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
+            var count = await unitOfWork.GetRepository<Invoice, int>().CountAsync(specCount);
+
+            return new InvoicePaginationResponse<InvoiceResultDto>(
+                pageIndex: invoiceSpecsParams.PageIndex,
+                pageSize: invoiceSpecsParams.PageSize,
+                totalCount: count,
+                data: result,
+                grandTotal: calculatedGrandTotal
             );
         }
 
