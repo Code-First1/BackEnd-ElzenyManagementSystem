@@ -13,7 +13,7 @@ namespace Shared.Response
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
         public IEnumerable<InvoiceResultDto> Data { get; set; }
-        public decimal GrandTotal { get; set; }
+        public decimal? GrandTotal { get; set; }
         public InvoicePaginationResponse(int pageIndex, int pageSize, int totalCount, IEnumerable<InvoiceResultDto> data, decimal grandTotal)
         {
             PageIndex = pageIndex;
