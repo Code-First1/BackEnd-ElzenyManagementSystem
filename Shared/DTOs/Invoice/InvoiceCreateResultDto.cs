@@ -10,7 +10,8 @@ namespace Shared.DTOs.Invoice
     {
         public int Id { get; set; }
 
-        public int? TransferCount { get; set; }
+     
+        public List<InvoiceDerivedCreateDto> Items { get; set; } = new();
 
     }
 }
