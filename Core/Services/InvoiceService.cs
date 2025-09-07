@@ -29,13 +29,12 @@ namespace Services
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var inventoryRepo = unitOfWork.GetRepository<InventoryProduct, int>();
             var shopProductRepo = unitOfWork.GetRepository<ShopProduct, int>();
-            
 
             var allInventory = await inventoryRepo.GetAllAsync();
             var shopProducts = await shopProductRepo.GetAllAsync();
 
             decimal sum = 0;
-            int transactionCount = 0;
+            var resultItems = new List<InvoiceDerivedCreateDto>();
 
             foreach (var itemDto in dto.Items)
             {
@@ -54,67 +53,67 @@ namespace Services
                 if (itemDto.Quantity <= 0)
                     throw new Exception("Quantity must be greater than 0");
 
+                int transactionCount = 0;
 
                 if (shopProduct.Quantity < itemDto.Quantity)
                 {
-
                     int availableInShop = shopProduct.Quantity;
-
-
                     itemDto.Quantity -= availableInShop;
                     shopProduct.Quantity = 0;
+
                     if (product.QuantityForOrigin <= 0)
                     {
                         throw new Exception("Quantity must be greater than 0 in database");
                     }
-
 
                     int neededFromInventory = (int)Math.Ceiling((double)itemDto.Quantity / product.QuantityForOrigin);
 
                     if (inventoryProduct.Quantity < neededFromInventory)
                         throw new Exception($"Not enough stock in Inventory for product {product.Id}");
 
-
                     inventoryProduct.Quantity -= neededFromInventory;
-
-
                     shopProduct.Quantity += neededFromInventory * product.QuantityForOrigin;
-                   
 
                     if (shopProduct.Quantity < itemDto.Quantity)
                         throw new Exception($"Still not enough stock in Shop after refill for product {product.Id}");
 
                     shopProduct.Quantity -= itemDto.Quantity;
-                    transactionCount = shopProduct.Quantity;
+                    transactionCount = neededFromInventory;
                 }
                 else
                 {
-
                     shopProduct.Quantity -= itemDto.Quantity;
+                    transactionCount = 0;
                 }
-
 
                 shopProductRepo.Update(shopProduct);
                 inventoryRepo.Update(inventoryProduct);
 
-
                 decimal unitPrice = itemDto.Typing ? product.PrieceForWholeSale : product.PriceForRetail;
-
                 sum += itemDto.Quantity * unitPrice;
 
+                // Add invoice product to invoice
                 var invoiceItem = new InvoiceProduct
                 {
                     ProductId = product.Id,
                     Quantity = itemDto.Quantity,
                     UnitPrice = unitPrice,
-                    TransferCount=transactionCount
+                    TransferCount = transactionCount
                 };
-
                 invoice.InvoiceProducts.Add(invoiceItem);
+
+                // Add to result DTO
+                resultItems.Add(new InvoiceDerivedCreateDto
+                {
+                    productId = product.Id,
+                    productName = product.Name,
+                    transferCount = transactionCount
+                });
             }
 
             invoice.TotalPrice = sum;
             invoice.UserName = userName;
+
             var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
             await invoiceRepo.AddAsync(invoice);
             await unitOfWork.SaveChangesAsync();
@@ -122,9 +121,10 @@ namespace Services
             return new InvoiceCreateResultDto
             {
                 Id = invoice.Id,
-                TransferCount = transactionCount
+                Items = resultItems
             };
         }
+
 
 
 
