@@ -227,11 +227,12 @@ namespace Services
 
         public async Task<InvoicePaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams)
         {
-       
             var spec = new InvoiceWithProductsSpecification(invoiceSpecsParams);
-            var invoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
+            var allInvoices = await unitOfWork.GetRepository<Invoice, int>().GetAllAsync(spec);
+
             decimal grandTotal = 0;
-            if (!invoices.Any())
+
+            if (!allInvoices.Any())
             {
                 return new InvoicePaginationResponse<InvoiceResultDto>(
                     pageIndex: invoiceSpecsParams.PageIndex,
@@ -242,35 +243,28 @@ namespace Services
                 );
             }
 
-
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var allProducts = await productRepo.GetAllAsync();
 
-            
             var invoiceProductRepo = unitOfWork.GetRepository<InvoiceProduct, int>();
             var allInvoiceProducts = await invoiceProductRepo.GetAllAsync();
 
-          
-            var result = mapper.Map<IEnumerable<InvoiceResultDto>>(invoices);
+            var result = mapper.Map<IEnumerable<InvoiceResultDto>>(allInvoices).ToList();
 
-        
             foreach (var invoiceDto in result)
             {
                 decimal total = 0;
-              
+
                 foreach (var item in invoiceDto.InvoiceProduct)
                 {
-                
                     var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
                     if (product != null)
                     {
                         item.ProductName = product.Name;
                     }
 
-               
                     var invProd = allInvoiceProducts
                         .FirstOrDefault(ip => ip.ProductId == item.ProductId && ip.InvoiceId == invoiceDto.Id);
-
 
                     if (invProd != null)
                     {
@@ -283,20 +277,23 @@ namespace Services
                 grandTotal += total;
             }
 
-           
+          
+            var pagedResult = result
+                .Skip((invoiceSpecsParams.PageIndex - 1) * invoiceSpecsParams.PageSize)
+                .Take(invoiceSpecsParams.PageSize)
+                .ToList();
+
             var specCount = new InvoiceWithCountSpecification(invoiceSpecsParams);
             var count = await unitOfWork.GetRepository<Invoice, int>().CountAsync(specCount);
+
             return new InvoicePaginationResponse<InvoiceResultDto>(
-                  pageIndex: invoiceSpecsParams.PageIndex,
-                  pageSize: invoiceSpecsParams.PageSize,
-                  totalCount: count,
-                   grandTotal: grandTotal,
-                  data: result
-                 
-                  );
-
-
-
+                pageIndex: invoiceSpecsParams.PageIndex,
+                pageSize: invoiceSpecsParams.PageSize,
+                totalCount: count,
+                data: pagedResult,
+                grandTotal: grandTotal
+            );
         }
+
     }
-    }
+}
