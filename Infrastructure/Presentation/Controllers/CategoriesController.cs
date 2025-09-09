@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Shared.DTOs.Category;
@@ -17,6 +18,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route(template: "api/[controller]")]
+    [Authorize]
     public class CategoriesController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet] //GET: /api/categories

@@ -19,6 +19,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route(template: "api/[controller]")]
+    [Authorize]
     public class InvoicesController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet] //GET: /api/Invoices
