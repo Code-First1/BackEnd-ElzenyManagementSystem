@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Persistence;
-using Persistence.Identity;
+using Persistence.Data;
 using Services;
 using Shared.ErrorModels;
 using Shared.Options;
@@ -151,7 +151,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
         {
             services
                 .AddIdentity<AppUser, IdentityRole>()
-                .AddEntityFrameworkStores<ElzenyIdentityDbContext>();
+                .AddEntityFrameworkStores<ElzenyDbContext>();
 
             return services;
         }

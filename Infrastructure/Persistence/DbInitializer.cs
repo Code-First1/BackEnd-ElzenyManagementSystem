@@ -4,7 +4,6 @@ using Domain.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
-using Persistence.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,18 +17,15 @@ namespace Persistence
     public class DbInitializer : IDbInitializer
     {
         private readonly ElzenyDbContext _context;
-        private readonly ElzenyIdentityDbContext _identityDbContet;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         public DbInitializer(
             ElzenyDbContext context,
-            ElzenyIdentityDbContext identityDbContext,
             UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager
             )
         {
             _context = context;
-            _identityDbContet = identityDbContext;
             _userManager = userManager;
             _roleManager = roleManager;
         }
@@ -113,9 +109,9 @@ namespace Persistence
         public async Task InitializeIdentityAsync()
         {
             // Create Databse If it doesnt Exxists && Apply To Any Pending Migrations
-            if(_identityDbContet.Database.GetPendingMigrations().Any())
+            if(_context.Database.GetPendingMigrations().Any())
             {
-                await _identityDbContet.Database.MigrateAsync();
+                await _context.Database.MigrateAsync();
             }
 
             if (!_roleManager.Roles.Any())
