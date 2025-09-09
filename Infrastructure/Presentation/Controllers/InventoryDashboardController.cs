@@ -15,6 +15,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class InventoryDashboardController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;

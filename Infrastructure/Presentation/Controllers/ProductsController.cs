@@ -16,6 +16,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route(template:"api/[controller]")]
+    [Authorize]
     public class ProductsController(IServiceManager serviceManager) : ControllerBase
     {
         // sort : nameasc
@@ -24,7 +25,6 @@ namespace Presentation.Controllers
         // sort : priecdesc
 
         [HttpGet] //GET: /api/Products
-        [Authorize]
         [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status200OK, Type =  typeof(PaginationResponse<ProductResultDto>))]
         [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status500InternalServerError, Type =  typeof(ErrorDetails))]
         [ProducesResponseType<PaginationResponse<ProductResultDto>>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
