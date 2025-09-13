@@ -18,7 +18,7 @@ namespace Domain.Models
         public int ShopId { get; set; }
         public string UserName { get; set; }
 
-        public int number { get; set; } = 0;
+        public  int number { get; set; } = 0;
 
         // Navigation Property 
         public List<InvoiceProduct> InvoiceProducts { get; set; }
