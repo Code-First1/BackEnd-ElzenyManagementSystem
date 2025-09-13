@@ -25,10 +25,10 @@ namespace BackEnd_ElzenyManagementSystem
             builder.Services.RegisterAllServices(builder.Configuration);
 
             var app = builder.Build();
-
+            app.UseEgyptTimeZone();
             // Configre the HTTP request pipeline
             await app.ConfigureAllMiddlewares();
-
+          
             app.Run();
         }
     }

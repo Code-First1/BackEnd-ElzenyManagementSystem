@@ -18,6 +18,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
     {
         public static IServiceCollection RegisterAllServices(this IServiceCollection services, IConfiguration configuration)
         {
+            
             services.AddCorsServices();
             services.AddBuiltInServices();
             services.AddSwaggerServices();
@@ -28,6 +29,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
 
             services.ConfigureJwtServices(configuration);
             services.ConfigureServices();
+
             return services;
         }
 
@@ -154,6 +156,17 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
                 .AddEntityFrameworkStores<ElzenyIdentityDbContext>();
 
             return services;
+        }
+
+    
+        public static IApplicationBuilder UseEgyptTimeZone(this IApplicationBuilder app)
+        {
+            return app.Use(async (context, next) =>
+            {
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                context.Items["Now"] = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+                await next();
+            });
         }
     }
 }
