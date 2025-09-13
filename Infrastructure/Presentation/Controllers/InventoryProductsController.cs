@@ -16,6 +16,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class InventoryProductsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet]

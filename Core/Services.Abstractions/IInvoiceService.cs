@@ -15,11 +15,11 @@ namespace Services.Abstractions
     {
 
         //GetAllProduct
-        Task<PaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams);
+        Task<InvoicePaginationResponse<InvoiceResultDto>> GetInvoicesAsync(InvoiceSpecificationsParamters invoiceSpecsParams);
         //GetById
         Task<InvoiceResultDto?> GetInvoiceByIdAsync(int id);
 
-        Task<int> AddInvoiceAsync(string userName,InvoiceCreateDto dto);
+        Task<InvoiceCreateResultDto> AddInvoiceAsync(string userName,InvoiceCreateDto dto);
 
         Task<InvoiceResultDto?> UpdateInvoiceAsync(int id, InvoiceUpdateDto dto);
 

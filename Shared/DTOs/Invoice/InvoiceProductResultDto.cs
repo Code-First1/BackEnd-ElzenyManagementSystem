@@ -12,7 +12,7 @@ namespace Shared.DTOs.Invoice
         [JsonIgnore]
         public int ProductId { get; set; }
         public string ProductName { get; set; }
- 
+        public int? transterCount { get; set; }
         public decimal pricePerUnit {  get; set; }
         public int Quantity { get; set; }
     }

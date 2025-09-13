@@ -16,15 +16,13 @@ namespace Services.Specifications.Invoices
                 i =>
                     (!invoiceParams.ShopId.HasValue || i.ShopId == invoiceParams.ShopId) &&
                     (!invoiceParams.CreateAt.HasValue || i.CreateAt.Date == invoiceParams.CreateAt.Value.Date) &&
+                    (string.IsNullOrEmpty(invoiceParams.DisplayName) || i.UserName.ToLower() == invoiceParams.DisplayName.ToLower()) &&
                     (string.IsNullOrEmpty(invoiceParams.Search) ||
-                      
                         i.Shop.Name.ToLower().Contains(invoiceParams.Search.ToLower()))
             )
         {
             ApplyInclude();
-
             ApplySorting(invoiceParams.sort);
-
             ApplyPagination(invoiceParams.PageIndex, invoiceParams.PageSize);
         }
 
@@ -33,8 +31,7 @@ namespace Services.Specifications.Invoices
             //AddInclude(i => i.User);
             //AddInclude(i => i.Shop);
             AddInclude(i => i.InvoiceProducts);
-            AddInclude("InvoiceProduct.Product");
-
+            AddInclude("InvoiceProducts.Product");
         }
 
         private void ApplySorting(string? sort)

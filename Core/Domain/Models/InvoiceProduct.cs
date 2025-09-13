@@ -12,7 +12,7 @@ namespace Domain.Models
         public decimal UnitPrice { get; set; } 
 
         public decimal Total => Quantity * UnitPrice;
-
+        public int? TransferCount { get; set; } = 0;
         //Forign Keys
 
         [Required]

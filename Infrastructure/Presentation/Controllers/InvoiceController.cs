@@ -19,6 +19,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route(template: "api/[controller]")]
+    [Authorize]
     public class InvoicesController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet] //GET: /api/Invoices
@@ -26,7 +27,7 @@ namespace Presentation.Controllers
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status200OK, Type = typeof(PaginationResponse<InvoiceResultDto>))]
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
         [ProducesResponseType<PaginationResponse<InvoiceResultDto>>(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
-        public async Task<ActionResult<PaginationResponse<InvoiceResultDto>>> GetAll([FromQuery] InvoiceSpecificationsParamters invoiceSpecsParams)
+        public async Task<ActionResult<InvoicePaginationResponse<InvoiceResultDto>>> GetAll([FromQuery] InvoiceSpecificationsParamters invoiceSpecsParams)
         {
             var result = await serviceManager.InvoiceService.GetInvoicesAsync(invoiceSpecsParams);
             return Ok(result);
@@ -49,15 +50,15 @@ namespace Presentation.Controllers
         [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create([FromBody] InvoiceCreateDto dto)
+        public async Task<ActionResult<InvoiceCreateResultDto>> Create([FromBody] InvoiceCreateDto dto)
         {
             var username = User.FindFirst("user_name")?.Value;
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var newId = await serviceManager.InvoiceService.AddInvoiceAsync(username,dto);
+            var CreateInvoice = await serviceManager.InvoiceService.AddInvoiceAsync(username,dto);
 
-            return CreatedAtAction(nameof(GetById), new { id = newId }, new { id = newId });
+            return CreateInvoice;
         }
 
         [HttpDelete("{id:int}")]

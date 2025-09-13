@@ -6,7 +6,7 @@ namespace BackEnd_ElzenyManagementSystem.Middlewares
     {
         public static async Task<WebApplication> ConfigureAllMiddlewares(this WebApplication app)
         {
-            await app.InitializeDatabaseAsync();
+            //await app.InitializeDatabaseAsync();
 
             app.UseGlobalErrorHandling();
 
@@ -24,7 +24,9 @@ namespace BackEnd_ElzenyManagementSystem.Middlewares
             app.UseRouting();
 
             app.UseCors("AllowAll");
-
+            app.UseAuthentication();
+            // defined middleware to reject any deleted user
+            app.UseCheckUserExists();
             app.UseAuthorization();
 
 
