@@ -1,7 +1,6 @@
-﻿using BackEnd_ElzenyManagementSystem.Middlewares;
-using Domain.Contracts;
+﻿using Domain.Contracts;
 
-namespace BackEnd_ElzenyManagementSystem.Extensions
+namespace BackEnd_ElzenyManagementSystem.Middlewares
 {
     public static class ConfigureMiddlewares
     {
@@ -45,7 +44,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
 
             return app;
         }
-        
+
         private static WebApplication UseGlobalErrorHandling(this WebApplication app)
         {
             app.UseMiddleware<GlobalErrorHandlingMiddleware>();

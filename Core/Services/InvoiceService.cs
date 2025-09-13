@@ -114,7 +114,7 @@ namespace Services
 
             invoice.TotalPrice = sum;
             invoice.UserName = userName;
-
+            invoice.number++;
             var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
             await invoiceRepo.AddAsync(invoice);
             await unitOfWork.SaveChangesAsync();
@@ -341,7 +341,7 @@ namespace Services
             return grandTotal;
         }
 
-
+        
         private DateTime GetEgyptTime()
         {
             var ctx = httpContextAccessor.HttpContext;
