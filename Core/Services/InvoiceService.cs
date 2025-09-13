@@ -201,14 +201,14 @@ namespace Services
 
             foreach (var item in result.InvoiceProduct)
             {
-                
+
                 var product = allProducts.FirstOrDefault(p => p.Id == item.ProductId);
                 if (product != null)
                 {
                     item.ProductName = product.Name;
                 }
 
-            
+
                 var invProd = allInvoiceProducts
                     .FirstOrDefault(ip => ip.ProductId == item.ProductId && ip.InvoiceId == result.Id);
 
@@ -348,7 +348,7 @@ namespace Services
             if (ctx != null && ctx.Items["EgyptTime"] is DateTime egyptTime)
                 return egyptTime;
 
-          
+
             var tz = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
         }

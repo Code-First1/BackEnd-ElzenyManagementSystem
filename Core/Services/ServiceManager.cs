@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -18,6 +19,7 @@ namespace Services
         IUnitOfWork unitOfWork,
         IMapper mapper,
         UserManager<AppUser> userManager,
+        IHttpContextAccessor httpContextAccessor,
         IOptions<JwtOptions> options,
         RoleManager<IdentityRole> roleManager
         ) : IServiceManager
@@ -28,7 +30,7 @@ namespace Services
         public IInventoryProductService InventoryProductService { get; } = new InventoryProductService(unitOfWork, mapper);
         public IShopProductService ShopProductService { get; } = new ShopProductService(unitOfWork, mapper);
 
-        public IInvoiceService InvoiceService { get; }= new InvoiceService(unitOfWork, mapper);
+        public IInvoiceService InvoiceService { get; }= new InvoiceService(unitOfWork, mapper, httpContextAccessor);
         public ITransactionPerProductService TransactionPerProductService { get; } = new TransactionPerProductService(unitOfWork);
         public IInventoryToShopTransactionService InventoryToShopTransactionService { get; } = new InventoryToShopTransactionService(unitOfWork, mapper);
         public IInventoryDashboardService InventoryDashboardService { get;} = new InventoryDashboardService(unitOfWork, mapper);
