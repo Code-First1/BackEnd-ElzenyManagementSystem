@@ -3,6 +3,7 @@ using Domain.Contracts;
 using Domain.Enums;
 using Domain.Models;
 using Domain.Models.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Abstractions;
 using Services.Specifications.Invoices;
@@ -13,7 +14,7 @@ using Shared.SpecificationsParam.Invoice;
 
 namespace Services
 {
-    public class InvoiceService(IUnitOfWork unitOfWork, IMapper mapper) : IInvoiceService
+    public class InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IInvoiceService
     {
 
         public async Task<InvoiceCreateResultDto> AddInvoiceAsync(string userName, [FromBody] InvoiceCreateDto dto)
@@ -22,7 +23,7 @@ namespace Services
             {
                 ShopId = dto.ShopId,
                 UserName = userName,
-                CreateAt = DateTime.UtcNow,
+                CreateAt = GetEgyptTime(),
                 InvoiceProducts = new List<InvoiceProduct>()
             };
 
@@ -340,8 +341,17 @@ namespace Services
             return grandTotal;
         }
 
-      
 
+        private DateTime GetEgyptTime()
+        {
+            var ctx = httpContextAccessor.HttpContext;
+            if (ctx != null && ctx.Items["EgyptTime"] is DateTime egyptTime)
+                return egyptTime;
+
+          
+            var tz = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
+        }
 
     }
 }
