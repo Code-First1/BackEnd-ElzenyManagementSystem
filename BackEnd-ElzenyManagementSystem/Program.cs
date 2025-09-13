@@ -41,9 +41,10 @@ namespace BackEnd_ElzenyManagementSystem
 
      
             RecurringJob.AddOrUpdate<IInvoiceService>(
-                "reset-invoice-number", 
+                "ResetInvoiceNumberAsync", 
                 service => service.ResetInvoiceNumberAsync(),
-                "0 0 * * *" 
+                "0 0 * * *" ,
+                TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time")
             );
 
             app.Run();

@@ -114,15 +114,20 @@ namespace Services
 
             invoice.TotalPrice = sum;
             invoice.UserName = userName;
-            var today = DateTime.UtcNow.Date;
+            var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
+                      TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"));
+            var today = egyptTime.Date;
+
             var lastInvoiceToday = (await invoiceRepo.GetAllAsync())
-                                    .Where(i => i.CreateAt.Date == today)
+                                    .Where(i => TimeZoneInfo.ConvertTimeFromUtc(i.CreateAt,
+                                           TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time")).Date == today)
                                     .OrderByDescending(i => i.number)
                                     .FirstOrDefault();
 
             int newNumber = lastInvoiceToday != null ? lastInvoiceToday.number + 1 : 1;
 
             invoice.number = newNumber;
+
             await invoiceRepo.AddAsync(invoice);
             await unitOfWork.SaveChangesAsync();
 
