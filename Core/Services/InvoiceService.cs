@@ -30,7 +30,7 @@ namespace Services
             var productRepo = unitOfWork.GetRepository<Product, int>();
             var inventoryRepo = unitOfWork.GetRepository<InventoryProduct, int>();
             var shopProductRepo = unitOfWork.GetRepository<ShopProduct, int>();
-
+            var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
             var allInventory = await inventoryRepo.GetAllAsync();
             var shopProducts = await shopProductRepo.GetAllAsync();
 
@@ -114,8 +114,20 @@ namespace Services
 
             invoice.TotalPrice = sum;
             invoice.UserName = userName;
+            var egyptTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
+                      TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time"));
+            var today = egyptTime.Date;
 
-            var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
+            var lastInvoiceToday = (await invoiceRepo.GetAllAsync())
+                                    .Where(i => TimeZoneInfo.ConvertTimeFromUtc(i.CreateAt,
+                                           TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time")).Date == today)
+                                    .OrderByDescending(i => i.number)
+                                    .FirstOrDefault();
+
+            int newNumber = lastInvoiceToday != null ? lastInvoiceToday.number + 1 : 1;
+
+            invoice.number = newNumber;
+
             await invoiceRepo.AddAsync(invoice);
             await unitOfWork.SaveChangesAsync();
 
@@ -341,7 +353,7 @@ namespace Services
             return grandTotal;
         }
 
-
+        
         private DateTime GetEgyptTime()
         {
             var ctx = httpContextAccessor.HttpContext;

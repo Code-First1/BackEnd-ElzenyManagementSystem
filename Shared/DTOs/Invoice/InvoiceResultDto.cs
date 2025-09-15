@@ -15,6 +15,7 @@ namespace Shared.DTOs.Invoice
 
         public DateTime DateTime { get; set; }
         public decimal Total { get; set; }
+        public int number { get; set; }
         public IEnumerable<InvoiceProductResultDto> InvoiceProduct { get; set; }
         // other properties...
     }

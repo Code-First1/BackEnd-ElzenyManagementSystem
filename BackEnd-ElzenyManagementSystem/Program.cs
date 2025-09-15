@@ -1,7 +1,8 @@
-
 using BackEnd_ElzenyManagementSystem.Extensions;
 using BackEnd_ElzenyManagementSystem.Middlewares;
 using Domain.Contracts;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,7 @@ using Services;
 using Services.Abstractions;
 using Shared.ErrorModels;
 using System.Threading.Tasks;
+using IInvoiceService = BackEnd_ElzenyManagementSystem.Extensions.IInvoiceService;
 
 namespace BackEnd_ElzenyManagementSystem
 {
@@ -24,11 +26,14 @@ namespace BackEnd_ElzenyManagementSystem
             // Add Services To The Container
             builder.Services.RegisterAllServices(builder.Configuration);
 
+           
+          
+
             var app = builder.Build();
             app.UseEgyptTimeZone();
             // Configre the HTTP request pipeline
             await app.ConfigureAllMiddlewares();
-          
+
             app.Run();
         }
     }

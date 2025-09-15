@@ -9,7 +9,8 @@ public class InvoiceProfile : Profile
         CreateMap<Invoice, InvoiceResultDto>()
         .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
         .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.CreateAt))
-        .ForMember(dest => dest.InvoiceProduct, opt => opt.MapFrom(src => src.InvoiceProducts));
+        .ForMember(dest => dest.InvoiceProduct, opt => opt.MapFrom(src => src.InvoiceProducts))
+        .ForMember(dest => dest.number, opt => opt.MapFrom(src => src.number));
 
         CreateMap<InvoiceProduct, InvoiceProductResultDto>()
             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
