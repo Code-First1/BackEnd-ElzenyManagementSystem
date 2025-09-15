@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Identity;
+using Persistence.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,7 +13,7 @@ public class CheckUserExistsMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, ElzenyIdentityDbContext db)
+    public async Task InvokeAsync(HttpContext context, ElzenyDbContext db)
     {
         if (context.User?.Identity?.IsAuthenticated == true)
         {

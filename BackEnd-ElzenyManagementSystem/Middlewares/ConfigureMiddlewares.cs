@@ -6,7 +6,9 @@ namespace BackEnd_ElzenyManagementSystem.Middlewares
     {
         public static async Task<WebApplication> ConfigureAllMiddlewares(this WebApplication app)
         {
+
             await app.InitializeDatabaseAsync();
+
 
             app.UseGlobalErrorHandling();
 

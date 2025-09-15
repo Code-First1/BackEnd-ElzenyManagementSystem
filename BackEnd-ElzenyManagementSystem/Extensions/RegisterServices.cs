@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Persistence;
-using Persistence.Identity;
+using Persistence.Data;
 using Services;
 using Shared.ErrorModels;
 using Shared.Options;
@@ -18,6 +18,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
     {
         public static IServiceCollection RegisterAllServices(this IServiceCollection services, IConfiguration configuration)
         {
+            
             services.AddCorsServices();
             services.AddBuiltInServices();
             services.AddSwaggerServices();
@@ -28,6 +29,7 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
 
             services.ConfigureJwtServices(configuration);
             services.ConfigureServices();
+
             return services;
         }
 
@@ -151,9 +153,20 @@ namespace BackEnd_ElzenyManagementSystem.Extensions
         {
             services
                 .AddIdentity<AppUser, IdentityRole>()
-                .AddEntityFrameworkStores<ElzenyIdentityDbContext>();
+                .AddEntityFrameworkStores<ElzenyDbContext>();
 
             return services;
+        }
+
+    
+        public static IApplicationBuilder UseEgyptTimeZone(this IApplicationBuilder app)
+        {
+            return app.Use(async (context, next) =>
+            {
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                context.Items["Now"] = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+                await next();
+            });
         }
     }
 }

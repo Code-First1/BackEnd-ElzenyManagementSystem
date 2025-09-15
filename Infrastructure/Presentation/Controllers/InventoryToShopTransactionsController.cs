@@ -17,6 +17,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class InventoryToShopTransactionsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpPost]
