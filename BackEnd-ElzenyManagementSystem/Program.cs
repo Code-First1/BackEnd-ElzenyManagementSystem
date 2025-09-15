@@ -27,25 +27,17 @@ namespace BackEnd_ElzenyManagementSystem
             builder.Services.RegisterAllServices(builder.Configuration);
 
            
-            builder.Services.AddHangfire(config =>
-                config.UseMemoryStorage());
-            builder.Services.AddHangfireServer();
+          
 
             var app = builder.Build();
 
             // Configre the HTTP request pipeline
             await app.ConfigureAllMiddlewares();
 
-            // Hangfire Dashboard (UI)
-            app.UseHangfireDashboard();
+         
 
      
-            RecurringJob.AddOrUpdate<IInvoiceService>(
-                "ResetInvoiceNumberAsync", 
-                service => service.ResetInvoiceNumberAsync(),
-                "0 0 * * *" ,
-                TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time")
-            );
+       
 
             app.Run();
         }
