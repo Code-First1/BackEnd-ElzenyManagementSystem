@@ -20,6 +20,7 @@ namespace Presentation.Controllers
             var totalProducts = await serviceManager.DashboardService.GetTotalProductsAsync();
             return Ok(totalProducts);
         }
+
         [HttpGet("revenue")]
         public async Task<IActionResult> GetRevenue([FromQuery] int days)
         {

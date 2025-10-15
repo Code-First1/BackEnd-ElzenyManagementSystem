@@ -18,23 +18,42 @@ namespace Services
         public async Task<decimal> GetRevenueAsync(int days)
         {
             var invoiceRepo = unitOfWork.GetRepository<Invoice, int>();
-
             var today = DateTime.Today;
-            var startDate = today.AddDays(-days);      
-            var endDate = today.AddDays(1);            
+
+            DateTime startDate;
+            DateTime endDate;
+
+            if (days == 1)
+            {
+                
+                startDate = today;
+                endDate = today.AddDays(1);
+            }
+            else if (days == 7)
+            {
+                
+                int daysSinceSunday = (int)today.DayOfWeek;
+                startDate = today.AddDays(-daysSinceSunday);
+                endDate = today.AddDays(1);
+            }
+            else
+            {
+                
+                startDate = today.AddDays(-days);
+                endDate = today.AddDays(1);
+            }
 
             var spec = new BaseSpecifications<Invoice, int>(
                 i => i.CreateAt >= startDate && i.CreateAt < endDate
             );
 
             var invoices = await invoiceRepo.GetAllAsync(spec);
-            decimal total = 0;
-            foreach (var invoice in invoices)
-            {
-                total += invoice.TotalPrice;
-            }
 
-            return total;
+            
+            if (invoices == null || !invoices.Any())
+                return 0;
+
+            return invoices.Sum(i => i.TotalPrice);
         }
 
 
